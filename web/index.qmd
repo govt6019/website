@@ -1,0 +1,41 @@
+---
+title: "{{< var course.title >}}"
+---
+
+Welcome to the course website for **{{< var course.code >}}: {{< var course.title >}}**,
+{{< var course.semester >}}. This site and the [GitHub repository](https://github.com/govt6019/website)
+behind it are the primary location for all course materials.
+
+## Start here
+
+- **[Schedule](schedule.qmd)** — follow along.
+- **[Setup](setup.qmd)** — are you ready?
+- **[Readings](readings.qmd)** — what to read and when.
+- **[Syllabus](materials/syllabus.pdf)** — it's in the syllabus.
+
+## The course
+
+This is the first course in the quantitative methods sequence in the Cornell
+Department of Government. It takes you from the basics of data and measurement, through probability and statistical inference, to the linear regression model and its interpretation.
+
+The course meets twice a week. **Seminar is Friday**; **discussion section is the
+Wednesday after**, and works through the previous seminar's material in R.
+
+## Logistics
+
+|  |  |
+|:--|:--|
+| **Seminar** | Fridays, 2:00–4:30pm |
+| **Discussion section** | Wednesdays, 12:20–1:10pm |
+| **Instructor** | {{< var course.instructor >}} · [{{< var course.instructor_email >}}](mailto:{{< var course.instructor_email >}}) |
+| **Instructor office hours** | {{< var course.instructor_office_hours >}} · {{< var course.instructor_office >}} |
+| **Teaching assistant** | {{< var course.ta >}} · [{{< var course.ta_email >}}](mailto:{{< var course.ta_email >}}) |
+| **TA office hours** | {{< var course.ta_office_hours >}} · {{< var course.ta_office >}} |
+
+: {tbl-colwidths="[28,72]"}
+
+## Assessment
+
+Two in-class exams, 50% each: the **midterm on Friday, October 16** and the **final** during the December exam period.
+
+Homework is **ungraded**. Write out real answers anyway. Work together.

@@ -1,0 +1,38 @@
+course:
+  code: "GOVT 6019"
+  title: "Introduction to Probability and Applied Statistics"
+  semester: "Fall 2026"
+  instructor: "Melissa Sands"
+  instructor_email: "m.sands@cornell.edu"
+  instructor_office: "201 White Hall"
+  instructor_office_hours: "Wednesdays, 1:30-2:30pm"
+  institution: "Department of Government, Cornell University"
+  ta: "Izza Malik"
+  ta_email: "im423@cornell.edu"
+  ta_office: "B13 White Hall"
+  ta_office_hours: "Thursdays, 10:00-11:00am"
+  website: "https://govt6019.github.io/website/"
+  meeting: "Fri 2:00-4:30pm seminar + Wed 12:20-1:10pm section"
+
+# Week numbers, referenced from decks as {{< var wk.probability >}} etc.
+# ALWAYS cross-reference weeks through these, never by literal number:
+# the schedule has been renumbered twice (14 -> 13 sessions, then the
+# probability compression), and every hard-coded "Week 9" had to be chased
+# through the decks by hand. Change a number here, re-render, done.
+wk:
+  data: "1"
+  description: "2"
+  probability: "3"
+  expectation: "4"
+  estimation: "5"
+  inference: "6"
+  midterm: "7"
+  ols1: "8"
+  ols2: "9"
+  extensions: "10"
+  reginference: "11"
+  presenting: "12"
+  # Presenting and causality are the SAME session (12): the Nov 13 seminar was
+  # cancelled, so the old closing pair merged into one presentation-and-
+  # interpretation session with a short coda on what comes next.
+  causality: "12"

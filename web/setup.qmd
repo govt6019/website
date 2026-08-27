@@ -1,0 +1,109 @@
+---
+title: "Setup"
+---
+
+You will need two things for this class: **R** and **Positron**. Git is optional but worth having.
+
+Do this before the first discussion section. The first section walks through installation, but it goes much better if you arrive with something already working.
+
+Positron is Posit's data science IDE — the same people who make RStudio. If you have used RStudio before, everything you know transfers: the console, scripts, plots and variables are all still there, laid out a little differently.
+
+---
+
+## Install in this order
+
+The order matters. Positron does not install R and does not warn you about it.
+
+### 1. R
+
+Download from [cloud.r-project.org](https://cloud.r-project.org/). Take the build that matches your machine — Apple Silicon Macs need the `arm64` package, not the Intel one. Accept the defaults.
+
+Verify: open R and check that it prints a version number of **4.2 or above**. Positron supports 4.2 and higher only; it will find older installations and then discard them, which looks like R is missing when it is merely too old.
+
+### 2. Positron
+
+Download from [positron.posit.co/download.html](https://positron.posit.co/download.html). It is free.
+
+- **macOS** — requires macOS 11 or later. Take the Apple Silicon build on an M-series Mac, the Intel build otherwise.
+- **Windows** — take the **User install** unless you have administrator rights and want it available to everyone on the machine. Windows also needs the latest Visual C++ Redistributable, which most machines already have.
+
+**Install R first.** Positron finds R by itself — on macOS it looks in `/Library/Frameworks/R.framework/Versions` and on your `PATH`; on Windows it checks `Program Files\R`, `AppData\Local\Programs\R`, and the registry. With no R installed there is nothing to find, and Positron opens with no R session, which looks like Positron is broken. It is not. Install R, then reopen Positron.
+
+If R is installed and the Console still does not start one, use the interpreter picker at the top of the Console (**Select Interpreter**) and choose your R version.
+
+### 3. Do not install Quarto
+
+**Positron already includes Quarto.** Plenty of tutorials open by telling you to download Quarto separately. You do not need to. A separate install can end up ahead of or behind the one Positron uses, and then two machines that look identical behave differently.
+
+### 4. The tidyverse
+
+In the Positron **Console**:
+
+```r
+install.packages("tidyverse")
+```
+
+This is one command that installs about thirty packages, so it takes a few minutes and prints a great deal of output. That is normal.
+
+If R asks whether to use a **personal library**, say yes. On a new machine the system-wide library is usually not writable, and without a personal library the install fails with `unable to install packages` — which reads like a network problem but is a permissions one.
+
+You install a package **once per machine** and load it **once per session**:
+
+```r
+install.packages("tidyverse")   # once per computer; note the quotes
+library(tidyverse)              # once per session; no quotes
+```
+
+This distinction trips up everyone at first. `install.packages()` buys the book; `library()` takes it off the shelf. When you see `could not find function "read_csv"`, the diagnosis is almost always a missing `library(tidyverse)` at the top of your script.
+
+Loading the tidyverse prints a list of attached packages and a couple of "conflicts." Also normal, also not an error.
+
+### 5. Git — optional
+
+You do not need Git to take this course. Everything here can be downloaded from GitHub with the green **Code** button and **Download ZIP**.
+
+Git is worth having anyway, because it means one command brings you every new week's materials instead of re-downloading. If you want it:
+
+- **macOS**: run `xcode-select --install` in Terminal and click through the dialog.
+- **Windows**: [Git for Windows](https://git-scm.com/download/win). The installer asks a great many questions and the defaults are fine.
+- **Linux**: `sudo apt install git`
+
+Then clone this repository once:
+
+```
+git clone https://github.com/govt6019/website.git
+```
+
+After that, `git pull` from inside the folder brings you every new week's materials.
+
+---
+
+## Check that it works
+
+In the Positron Console:
+
+```r
+# Version 4.2 or above?
+R.version.string
+
+# Packages load?
+library(tidyverse)
+
+# Can you read the course dataset?
+voter <- read_csv("data/voter2012.csv")
+dim(voter)
+```
+
+That last one depends on where you are working from. If it fails with a message about the file not existing, the problem is almost never the file — it is that R is looking somewhere else. `getwd()` tells you where R currently is. Section 1 covers this properly.
+
+Then, visually: make a new file, save it with a `.qmd` extension, put one R chunk in it, and click **Preview** in the editor's action bar. Check that you get an HTML page out.
+
+---
+
+## When something breaks
+
+**Restart R.** Use the restart button in the Console's action bar, or open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows) and run **Restart Active Interpreter Session**. This fixes a surprising amount and does not lose your script. Restarting fresh and running your code from the top is the single most useful debugging move you have.
+
+Read the error message before anything else. Most R errors name the function that failed and the thing it could not find, and that is usually the whole diagnosis.
+
+If you are stuck for more than twenty minutes, stop and bring it to section or office hours. Do not lose an evening to an install problem.

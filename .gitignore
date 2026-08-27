@@ -1,0 +1,38 @@
+# R
+.Rhistory
+.Rapp.history
+.RData
+.RDataTmp
+.Ruserdata
+.Renviron
+.Rproj.user/
+
+# Quarto
+/.quarto/
+_freeze/
+*_files/
+# working copy Quarto makes while rendering; docs/site_libs is tracked
+/site_libs/
+/web/site_libs/
+# generated LaTeX from renders (theme sources are tracked)
+materials/lectures/*.tex
+materials/discussion_section/*.tex
+materials/homework/*.tex
+
+# docs/ is the local render target. It is not committed: the site is built
+# and deployed by .github/workflows/publish.yml, so the repo carries one
+# copy of the materials rather than two.
+/docs/
+
+# Instructor-only material must never land here
+*_solutions.*
+plan_*.md
+notes_*.md
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+Icon?
+
+**/*.quarto_ipynb

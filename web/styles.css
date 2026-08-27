@@ -1,0 +1,18 @@
+/* GOVT 6019 — small tweaks on top of the cosmo theme. */
+
+/* Slightly narrower measure: long prose is easier to read. */
+main {
+  max-width: 52rem;
+}
+
+main table {
+  font-size: 0.95rem;
+}
+
+/* The date line under each week heading on the schedule. */
+main h3 + p em {
+  color: #6c757d;
+  font-style: normal;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+}

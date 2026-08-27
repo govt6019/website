@@ -1,0 +1,35 @@
+---
+title: "Readings"
+---
+
+## Texts
+
+**G — Gailmard, *Statistical Modeling and Inference for Social Science*** (Cambridge University Press, 2014). 
+
+**A&M — Aronow & Miller, *Foundations of Agnostic Statistics*** (Cambridge University Press, 2019). 
+
+## Free companions
+
+**R4DS — Wickham, Çetinkaya-Rundel & Grolemund, *R for Data Science*, 2nd edition.** <https://r4ds.hadley.nz/> 
+
+**MtM — Arel-Bundock, *Model to Meaning*** (CRC Press, 2026). <https://marginaleffects.com/> 
+
+**Healy — Healy, *Data Visualization: A Practical Introduction*.** <https://socviz.co/> 
+
+## By week
+
+| Wk | Topic | Reading |
+|---:|:------|:--------|
+| 1 | Data and measurement | G 1, 2.1; R4DS *Whole game* |
+| 2 | Describing empirical data | G 2.2–2.3; R4DS *Exploratory data analysis*, *Factors*, *Missing values* |
+| 3 | Probability and data-generating processes | G 3–4; A&M 1.1–1.2 |
+| 4 | Expectation and the sample mean | G 5–6; A&M 1.3, 2 |
+| 5 | Estimation and large samples | G 7, 9.2; A&M 3 |
+| 6 | Inference | G 8, 9.1; A&M 3 |
+| 7 | Midterm exam | — |
+| 8 | Linear regression I | G 2.3.5–2.3.6; A&M 4.1 |
+| 9 | Linear regression II | G 7.5; A&M 4.1–4.2 |
+| 10 | Linear regression III | G 2.3.7, 6.7; A&M 4.4; MtM *Slopes* |
+| 11 | Inference for regression | G 8.5; A&M 4.2–4.3 |
+| 12 | Presenting and interpreting results | MtM I–II; Healy *Work with Models*; A&M 4.5, 7 |
+

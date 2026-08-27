@@ -1,0 +1,49 @@
+project:
+  type: website
+  output-dir: ../docs
+  # Only the site pages are rendered here. Labs and homework are rendered
+  # separately and in place — see README.
+  render:
+    - index.qmd
+    - schedule.qmd
+    - readings.qmd
+    - setup.qmd
+  resources:
+    - .nojekyll          # keep GitHub Pages from running Jekyll on docs/
+  # ../materials is copied into the built site by the publish workflow, not
+  # here: it sits outside this project, so Quarto cannot treat it as a resource.
+
+website:
+  title: "GOVT 6019"
+  description: "Introduction to Probability and Applied Statistics — Cornell Government, Fall 2026"
+  site-url: "https://govt6019.github.io/website/"
+  repo-url: "https://github.com/govt6019/website"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: schedule.qmd
+        text: Schedule
+      - href: readings.qmd
+        text: Readings
+      - href: setup.qmd
+        text: Setup
+    right:
+      - href: materials/syllabus.pdf
+        text: Syllabus
+      - icon: github
+        href: https://github.com/govt6019/website
+        aria-label: GitHub repository
+  page-footer:
+    left: "GOVT 6019 · Department of Government, Cornell University"
+    right: "Fall 2026"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    css: styles.css
+
+knitr:
+  opts_chunk:
+    crop: false

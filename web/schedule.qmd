@@ -1,0 +1,74 @@
+---
+title: "Schedule"
+---
+
+Materials appear here as we reach them.
+
+## Unit 1 · Data
+
+### Week 1 — Data and measurement {#wk1}
+
+*Seminar Fri Aug 28 · Section Wed Sep 2*
+
+
+*No seminar Fri Sep 4 (APSA). The discussion section still meets Wed Sep 9.*
+
+### Week 2 — Describing empirical data {#wk2}
+
+*Seminar Fri Sep 11 · Section Wed Sep 16*
+
+
+## Unit 2 · Probability
+
+### Week 3 — Probability and data-generating processes {#wk3}
+
+*Seminar Fri Sep 18 · Section Wed Sep 23*
+
+### Week 4 — Expectation and the sample mean {#wk4}
+
+*Seminar Fri Sep 25 · Section Wed Sep 30*
+
+## Unit 3 · Estimation and inference
+
+### Week 5 — Estimation and large samples {#wk5}
+
+*Seminar Fri Oct 2 · Section Wed Oct 7*
+
+### Week 6 — Inference {#wk6}
+
+*Seminar Fri Oct 9 · Section Wed Oct 14*
+
+*Fall Break, Sat Oct 10 – Tue Oct 13.*
+
+### Week 7 — Midterm exam {#wk7}
+
+*In class, Fri Oct 16 · Section Wed Oct 21*
+
+Covers Weeks 1–6: data through inference.
+
+## Unit 4 · Linear regression
+
+### Week 8 — Linear regression I {#wk8}
+
+*Seminar Fri Oct 23 · Section Wed Oct 28*
+
+### Week 9 — Linear regression II {#wk9}
+
+*Seminar Fri Oct 30 · Section Wed Nov 4*
+
+### Week 10 — Linear regression III {#wk10}
+
+*Seminar Fri Nov 6 · Section Wed Nov 11*
+
+*No seminar Fri Nov 13. The discussion section still meets Wed Nov 18.*
+
+### Week 11 — Inference for regression {#wk11}
+
+*Seminar Fri Nov 20 · Section Wed Dec 2*
+
+*Thanksgiving Break, Wed Nov 25 – Sun Nov 29: both meetings cancelled.*
+
+### Week 12 — Presenting and interpreting results {#wk12}
+
+*Seminar Fri Dec 4 — last seminar*
+
