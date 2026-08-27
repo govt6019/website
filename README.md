@@ -8,8 +8,7 @@ The course meets twice a week. Seminar is Friday; discussion section is the Wedn
 
 ## Repository structure
 
-Everything you need is in `materials/`. The rest builds the website.
-
+Everything you need is in `materials/`; the remaining files build this website. 
 ```
 materials/               everything for the course
   syllabus.pdf           the syllabus, start here
@@ -27,15 +26,6 @@ web/                     website source, not needed for the course
   setup.qmd              install R and Positron before the first section
   theme/                 LaTeX/Quarto theme files the sources need to render
 ```
-
-The site is built and published by `.github/workflows/publish.yml` on every
-push to `main`, so the rendered HTML is not committed and the repository holds
-one copy of each file rather than two.
-
-To preview locally, run `quarto render` from inside `web/`. Output goes to
-`docs/`, which is ignored by git. Links to course materials will not resolve in
-a local preview until you also run `cp -r materials docs/materials`, which is
-what the workflow does.
 
 Homework is ungraded, but you are strongly encouraged to do it properly anyway: the two in-class exams are
 built in exactly this style, so it is the best exam preparation available.
