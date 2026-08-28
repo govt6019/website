@@ -28,6 +28,10 @@ materials/homework/*.tex
 *_solutions.*
 plan_*.md
 notes_*.md
+# Exception: solution PDFs are published deliberately, after each set is due.
+# Only the rendered PDF, and only from the homework folder — the .qmd source
+# and every other *_solutions.* file stay ignored.
+!materials/homework/*_solutions.pdf
 
 # OS
 .DS_Store
