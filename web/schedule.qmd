@@ -11,6 +11,7 @@ Materials appear here as we reach them.
 *Seminar Fri Aug 28 · Section Wed Sep 2*
 
 - [Slides (handout)](materials/lectures/slides_w01_handout.pdf)
+- [Git and GitHub handout](materials/discussion_section/govt6019_git_github_handout.pdf)
 
 *No seminar Fri Sep 4 (APSA). The discussion section still meets Wed Sep 9.*
 
