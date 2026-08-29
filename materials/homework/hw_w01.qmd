@@ -1,0 +1,162 @@
+---
+title: "{{< var course.code >}}: Homework 1 — Data, Variables, Notation"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+# Part A — Concepts
+
+## Question 1: Levels of measurement
+
+For each variable below, state its **level of measurement** (nominal, ordinal,
+or interval-ratio) and whether it is **discrete or continuous**; flag any that
+are **binary**. Give one sentence of justification each. A couple of these are
+genuinely debatable, so the justification matters more than the label.
+
+a. `pid3` from `voter2012.csv` (1 Democrat · 2 Republican · 3 Other)
+b. `educ` from `voter2012.csv` (1 No HS · … · 6 Post-grad)
+c. `birthyr` from `voter2012.csv` (year of birth, 1921–1994)
+d. A country's Polity score ($-10$ = full autocracy … $+10$ = full democracy)
+e. The incumbent party's share of the two-party vote in a district (0–100%)
+f. Whether a country experienced a military coup in a given year (yes/no)
+
+## Question 2: Units of analysis
+
+In 2012, the states with the highest median household incomes — Maryland,
+New Jersey, Connecticut, Massachusetts — all voted for Obama, while some of the
+poorest states — Mississippi, West Virginia, Arkansas — went to Romney. A pundit
+concludes: "rich Americans vote Democratic."
+
+a. What is the unit of analysis in the *evidence*?
+b. What is the unit of analysis in the *claim*?
+c. Name the error the pundit is at risk of, and explain how the state-level
+   pattern above can be true even if, within every state, richer individuals
+   are *more* likely to vote Republican.
+d. What kind of data would you need to evaluate the claim as stated?
+
+## Question 3: Operationalizing "voted"
+
+Suppose the concept you care about is **electoral participation**: did a person
+vote in the November election? Two common operationalizations:
+
+- **(i) Self-report:** a post-election survey asks, "Did you vote in the
+  November election?"
+- **(ii) Validated record:** the survey respondent is matched to an official
+  state voter file, which records whether a ballot was cast.
+
+a. Give one strength and one weakness of each operationalization.
+b. Self-reports consistently *overstate* turnout. Is that random or systematic
+   measurement error? In which direction does it push a turnout rate computed
+   from survey responses?
+c. Suppose you want to describe turnout among voters under 30. Which
+   operationalization would you lean on, and what could still go wrong with it?
+
+# Part B — Notation
+
+## Question 4: Summation
+
+a. Simplify each expression as far as possible ($n$, $a$, $b$, and the $X_i$
+   may appear in your answer); evaluate (iii) as a number.
+
+   $$
+   \text{(i)}\ \sum_{i=1}^{n} a
+   \qquad
+   \text{(ii)}\ \sum_{i=1}^{n} (a + bX_i)
+   \qquad
+   \text{(iii)}\ \sum_{i=1}^{4} (2i - 1)
+   $$
+
+b. Here are 2012 presidential turnout rates for five states (percent of the
+   voting-eligible population, rounded): Minnesota 76, Wisconsin 73,
+   New Hampshire 71, Ohio 65, Texas 50. Treating these as $X_1, \dots, X_5$,
+   compute the average $\bar{X} = \frac{1}{n}\sum_{i=1}^{n} X_i$, then compute
+   each deviation $X_i - \bar{X}$ and the sum of the deviations.
+
+c. Your answer to (b) is not a coincidence. Show, in two lines of algebra, that
+   for *any* $n$ numbers, $\sum_{i=1}^{n} (X_i - \bar{X}) = 0$.
+
+d. True or false: $\left(\sum_{i=1}^{n} X_i\right)^2 = \sum_{i=1}^{n} X_i^2$.
+   If true, prove it; if false, give the smallest counterexample you can.
+
+<!-- REMOVED 2026-08-27: the logarithm material. Nothing in the course used
+     it: the only other mentions anywhere under course/ were these, Week 2
+     handles skew with mean-versus-median rather than a log transform, and the
+     payoff (percent-change interpretation of logged variables) belongs with
+     regression in Weeks 8-12, which is where POLI 175 taught it. To restore,
+     delete this comment wrapper.
+## Question 5: Logs and growth
+
+Between two presidential elections, County A's total votes cast went from
+40,000 to 42,000; County B's went from 40,000 to 60,000.
+
+a. Compute the exact proportional change $\frac{V_1 - V_0}{V_0}$ for each
+   county.
+b. Compute the log difference $\ln(V_1) - \ln(V_0)$ for each county (three
+   decimal places; any calculator or R's `log()`, which is the natural log).
+c. For which county is the log difference a good stand-in for the proportional
+   change? State the general rule your comparison illustrates.
+d. In one or two sentences: why do variables like GDP and population so often
+   enter political-economy datasets in logs?
+
+-->
+
+# Part C — Applied: the VOTER data
+
+These questions use the course dataset `voter2012.csv` and its codebook, both
+on the course site. Work in a script inside your course folder, as in lab.
+
+```{r}
+library(tidyverse)
+voter <- read_csv("data/voter2012.csv")   # adjust to your folder layout
+```
+
+## Question 5: First contact
+
+a. How many rows and how many columns does the dataset have? What is the unit
+   of observation?
+b. Produce a table of counts by `pid3` and `gender` (one function from lab does
+   this in a single line).
+c. Using the codebook, which party–gender combination is the most common in
+   the data, and how many respondents does it contain?
+d. How many respondents are missing `pid3`?
+
+## Question 6: How old is the electorate?
+
+a. The dataset contains no age variable. Why is `birthyr` enough? Create an
+   `age` variable.
+b. What are the youngest and oldest ages in the data, and how many respondents
+   have each?
+c. In one sentence: what assumption connects `birthyr` to a respondent's exact
+   age, and why is it harmless for describing this dataset?
+
+## Question 7 (stretch): Something is off
+
+Spend ten minutes exploring the dataset with `count()`, the codebook open
+beside you. **Find one thing that looks odd or hazardous** — a value that
+should not be averaged, a variable whose numbers point the "wrong" way,
+anything that would trip up a careless analyst. Present the evidence (a count
+table is enough) and say in a sentence or two what you would want to do about
+it. There are several right answers; we repair these in Week 2's lab.
+
+---
+
+*If you want more:* Gailmard, ch. 1 and section 2.1 (measurement, at exactly this
+level); Gelman et al., *Red State, Blue
+State, Rich State, Poor State* (Princeton, 2008) on Question 2's paradox;
+Ansolabehere & Hersh, "Validation: What Big Data Reveal About Survey
+Misreporting and the Real Electorate," *Political Analysis* 20(4), 2012, on
+Question 3.
