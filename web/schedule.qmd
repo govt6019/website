@@ -14,6 +14,8 @@ Materials appear here as we reach them.
 - [Git and GitHub handout](materials/discussion_section/govt6019_git_github_handout.pdf)
 - [Problem set 1](materials/homework/hw_w01.pdf)
 - [Week 1 data](materials/data/voter2012.csv)
+- [Voter 2012 codebook](materials/data/voter2012_codebook.md)
+- [Lab 1](materials/discussion_section/lab_w01.qmd)
 
 *No seminar Fri Sep 4 (APSA). The discussion section still meets Wed Sep 9.*
 
