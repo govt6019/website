@@ -15,7 +15,7 @@ Materials appear here as we reach them.
 - [Problem set 1](materials/homework/hw_w01.pdf)
 - [Week 1 data](materials/data/voter2012.csv)
 - [Voter 2012 codebook](materials/data/voter2012_codebook.md)
-- [Lab 1](materials/discussion_section/lab_w01.qmd)
+- [Lab 1 solutions](materials/discussion_section/lab_w01_solutions.qmd)
 
 *No seminar Fri Sep 4 (APSA). The discussion section still meets Wed Sep 9.*
 
