@@ -25,6 +25,7 @@ Materials appear here as we reach them.
 
 *Seminar Fri Sep 11 · Section Wed Sep 16*
 
+- [Slides (handout)](materials/lectures/slides_w02_handout.pdf)
 
 ## Unit 2 · Probability
 
