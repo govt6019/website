@@ -1,0 +1,254 @@
+---
+title: "{{< var course.code >}}: Homework 2 — Describing Data"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+# Part A — The algebra of center and spread
+
+## Question 1: The balancing point
+
+a. Show that for *any* numbers $X_1, \dots, X_n$,
+   $$
+   \sum_{i=1}^{n} \left( X_i - \bar{X} \right) = 0.
+   $$
+
+b. Now generalize. Show that for any constant $c$,
+   $$
+   \sum_{i=1}^{n} (X_i - c) = n(\bar{X} - c),
+   $$
+   and conclude that the deviations from $c$ sum to zero *if and only if*
+   $c = \bar{X}$.
+
+c. In one or two sentences: why does (a) disqualify the "average deviation"
+   $\frac{1}{n}\sum_i (X_i - \bar{X})$ as a measure of spread, and what are
+   the two repairs lecture offered?
+
+## Question 2: Rescaling without fear
+
+Let $Y_i = a + bX_i$ for every observation, where $a$ and $b$ are constants —
+a **linear transformation**. Note that you've seen this before, e.g., when we
+recoded survey responses from a 1–4 agreement item into a 0–1 importance
+score.
+
+a. Show that $\bar{Y} = a + b\bar{X}$.
+
+b. Show that $s^2_Y = b^2 \, s^2_X$, and therefore $s_Y = |b| \, s_X$.
+   Then answer two short follow-ups: why did $a$ disappear entirely, and why
+   does the SD formula need the absolute value?
+
+c. Write the rescale $(4 - x)/3$ in the form $a + bx$, identifying $a$
+   and $b$. Then, in R: compute the mean and SD of `important_gayr` *after*
+   recoding the Don't knows to `NA`; use your formulas from (a) and (b) to
+   **predict** the mean and SD of the rescaled 0–1 version; and finally
+   rescale in R to confirm your prediction to several decimal places.
+
+   ```{r}
+   library(tidyverse)
+   voter <- read_csv("data/voter2012.csv")   # adjust to your project's layout
+
+   gayr <- na_if(voter$important_gayr, 5)    # 5 = Don't know, not data
+   mean(gayr, na.rm = TRUE)
+   sd(gayr, na.rm = TRUE)
+   # now rescale to 0-1 and check your predictions
+   ```
+
+d. A colleague glances at your output and concludes: "the rescaled item's SD
+   is only a third of the original's — rescaling made the measure less
+   noisy." In one or two sentences, what is wrong with this?
+
+## Question 3: The mean minimizes squared deviations
+
+Suppose you must summarize $X_1, \dots, X_n$ with a single number $c$, and
+you count the cost of the summary as the total squared distance from the data:
+$$
+g(c) = \sum_{i=1}^{n} (X_i - c)^2.
+$$
+You will show that the cost-minimizing choice is exactly $\bar{X}$.
+
+a. Add and subtract $\bar{X}$ inside the square,
+   $X_i - c = (X_i - \bar{X}) + (\bar{X} - c)$, and expand $g(c)$ into three
+   sums.
+
+b. One of the three terms is always zero. Say which, and why.
+
+c. Conclude that
+   $$
+   g(c) = \sum_{i=1}^{n} (X_i - \bar{X})^2 + n(\bar{X} - c)^2,
+   $$
+   and explain why this means $g$ is minimized at $c = \bar{X}$ and nowhere
+   else. What is the minimum value of $g$, and how is it related to the
+   sample variance $s^2$?
+
+d. Parts (a) to (c) need no calculus. If you know calculus, work the
+   derivative version too; it is in the solutions.
+
+# Part B — Measurement
+
+## Question 4: Reliability or validity?
+
+For each vignette below: (1) diagnose the *primary* problem as one of
+**reliability** or **validity**; (2) be specific — which kind of reliability
+or validity is at stake; and (3) propose a one-sentence improvement.
+
+a. Two research assistants code the same 100 newspaper-reported protest
+   events using the same written codebook. Asked to classify each event as
+   violent or nonviolent, they agree on only 61 of the 100.
+
+b. Survey respondents are asked whether they voted in November; asked again
+   three months later, almost all give the same answer they gave the first
+   time. But matched against official records, the survey turnout rate is 14
+   points higher than the records show.
+
+c. A researcher measures *political interest* with a ten-question factual
+   quiz (naming officeholders, institutional rules). Scores are highly
+   stable on re-testing. A critic objects that the quiz mostly captures
+   schooling and news exposure, not how much politics interests anyone.
+
+d. A cross-national project codes a country as democratic if and only if it
+   held a multiparty election in the last five years. Coders almost never
+   disagree. Critics point to countries that hold regular multiparty
+   elections while jailing opposition leaders and controlling the press.
+
+## Question 5: Defend or attack this index
+
+A colleague proposes measuring **political engagement** for every VOTER
+respondent as an additive index of three ingredients, using the raw codes
+exactly as they sit in `voter2012.csv`:
+
+$$
+\text{engagement}_i \;=\; \frac{\texttt{pol\_interest}_i +
+\texttt{educ}_i + \texttt{important\_econ}_i}{3}.
+$$
+
+Write a short memo (aim for 200 words or fewer) to this colleague. Identify
+**at least three distinct problems** with the index as proposed, and label
+each one *fixable* (say how) or *fatal* (say why). End with a verdict:
+repair it, or abandon it? If repair, list the exact steps in order; if
+abandon, say what, if anything, in this file could measure engagement more
+defensibly.
+
+# Part C — Applied: the social-issues importance index
+
+In lab you built the four-item importance index, and the closing exercises
+built a leaner two-item version from the economic items (the economy and the
+budget deficit). That leaves the social pair — `important_gayr` and
+`unimportant_abort` — which you have not yet cleaned yourself.
+Keep the codebook open; one of these two items is reverse-framed.
+
+```{r}
+library(tidyverse)
+voter <- read_csv("data/voter2012.csv")   # adjust to your project's layout
+```
+
+## Question 6: Build it
+
+a. Recode the Don't knows (code 5) on both items to `NA` — into **new
+   columns**, leaving the raw ones untouched. How many 5s did each item contain?
+   Audit the recode: report `sum(is.na())` for each item before and after,
+   and confirm the counts add up.
+
+b. Flip the reverse-framed item. Audit the flip with a crosstab of raw
+   against flipped values, and say where the 2,432 respondents who
+   *strongly disagreed* that abortion is unimportant ended up.
+
+c. Rescale both cleaned items to 0–1 with higher = more important, then
+   combine them into a two-item index with `rowMeans(..., na.rm = TRUE)`.
+   Report: how many of the 8,000 respondents receive a score, and the
+   index's mean, median, and SD.
+
+   ```{r}
+   # one route to the rowMeans step, once gayr_01 and abort_01 exist:
+   voter$social_index <- voter |>
+     select(gayr_01, abort_01) |>
+     rowMeans(na.rm = TRUE)
+   voter$social_index[is.nan(voter$social_index)] <- NA   # answered neither
+   ```
+
+d. The `na.rm = TRUE` choice scores anyone who answered at least one item.
+   How many respondents are scored under this rule but would be dropped by
+   listwise deletion (requiring both items)? How many receive no score under
+   either rule?
+
+e. Compare the index's mean and median to each other — and then to the
+   lab's *economic* pair (mean 0.90, median 1.00, jammed against the
+   ceiling). What does the comparison say about the two distributions'
+   shapes? Confirm with a quick histogram (`binwidth = 1/6` works well for
+   a two-item index that lives on sixths).
+
+## Question 7: Don't know, but louder
+
+How much damage do disguised nonresponse codes actually do? Use the **raw**
+`important_gayr` (scale 1–4, plus 5 = Don't know) and compare three
+treatments of the Don't knows:
+
+- **Rule 1 (careless):** keep the 5s as data;
+- **Rule 2 (missing-data rule):** recode 5 to `NA`;
+- **Rule 3 (the tempting shortcut):** recode 5 to the scale midpoint, 2.5 —
+  "they probably feel average."
+
+```{r}
+x_keep <- voter$important_gayr
+x_na   <- na_if(voter$important_gayr, 5)
+x_mid  <- if_else(voter$important_gayr == 5, 2.5, voter$important_gayr)
+```
+
+a. How many respondents chose Don't know, and what share of the item's
+   nonmissing answers is that?
+
+b. Compute the mean and the median under each of the three rules; arrange
+   the six numbers in a small table.
+
+c. In two or three sentences: which summary moved and which never budged,
+   and why?
+
+d. **(Stretch.)** The careless mean is a weighted mean in disguise: if a
+   share $p$ of answers are Don't knows and the honest mean of the rest is
+   $m$, then keeping the 5s gives exactly $(1-p)\,m + 5p$. Verify this
+   numerically. Then use the formula twice: predict the careless mean for a
+   hypothetical item with the *same* honest mean but $p = 0.20$; and explain
+   why the same 39 Don't knows distort `important_econ` (honest mean about
+   1.12) more than they distort `important_gayr` (honest mean about 2.68).
+
+## Question 8: One good graph
+
+Make **one presentation-quality figure** comparing the distribution of your
+Question 6 index across the three party groups (`pid3`, as a labeled
+factor). Any sensible geometry is fine — grouped boxplots, faceted
+histograms, bars of shares — but it must clear the bar you would set for a
+figure in a paper:
+
+- factor levels labeled with words, never raw codes;
+- `theme_gov()` and the course palette;
+- a title that states the figure's message as a sentence;
+- axes labeled, with units or scale made clear;
+- if you use bars, they start at zero;
+- and a **two-sentence caption**: first sentence, the substantive finding;
+  second sentence, a caveat or scope note (remember whose data this is and
+  what year it comes from).
+
+One thing to watch: the party groups differ a lot in size, so raw counts are
+not comparable across groups — compare *shares* within each group instead.
+
+---
+
+*If you want more:* Gailmard, sections 2.2--2.3 covers the central-tendency and
+dispersion material in Part A at exactly this
+level; Healy, *Data Visualization: A Practical Introduction*, ch. 1,
+is the best short read before attempting Question 8; and Ansolabehere,
+Rodden & Snyder, "The Strength of Issues," *APSR* 102(2), 2008, is the
+measurement argument that justifies ever building an index at all.
