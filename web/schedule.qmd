@@ -27,6 +27,7 @@ Materials appear here as we reach them.
 
 - [Slides (handout)](materials/lectures/slides_w02_handout.pdf)
 - [Problem set 2](materials/homework/hw_w02.pdf)
+- [Discussion section 2](materials/discussion_section/lab_w02.qmd)
 
 
 ## Unit 2 · Probability
