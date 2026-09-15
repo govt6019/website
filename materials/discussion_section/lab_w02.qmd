@@ -1,0 +1,412 @@
+---
+title: " Week 2 Lab — The Cleaning Lab"
+subtitle: "Cornell University  (Fall 2026)"
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+Today is about turning awkwardly coded survey items into something you can
+actually report. The theme is one sentence long: *never trust a recode you
+have not checked.* R will execute wrong instructions as cheerfully as right
+ones, and no error message will save you.
+
+Keep the codebook (`data/voter2012_codebook.md`) open beside your script for
+the entire session. The columns are bare integers, and only the codebook says
+what they mean.
+
+# Setup
+
+Start a fresh script (`lab02.R`) inside your course project, load the
+tidyverse.
+
+```{r setup}
+library(tidyverse)
+```
+
+The read the data.
+
+```{r}
+voter_raw <- read_csv("voter2012.csv")
+dim(voter_raw)
+```
+
+8,000 respondents, nine columns, same as last week. Note the object is called
+`voter_raw`, not `voter`. That is deliberate: we are about to modify this data
+heavily, and keeping an untouched copy means every recode can be checked
+against what the file actually said.
+
+
+# Missingness in disguise
+
+Week 1 ended with a puzzle: 39 people apparently rated the economy a 5 on a
+4-point agreement scale. The codebook decodes the trick — **5 = Don't know**,
+nonresponse wearing a number. All four issue items do this, and `pol_interest`
+plays the same game with **4 = Not sure**.
+
+The repair tool is `na_if(x, value)`: it returns `x` with every occurrence of
+`value` replaced by `NA`. We apply it to all four issue items at once, and
+re-derive `age` while we are here:
+
+```{r clean}
+issue_items <- c("important_econ", "important_gayr",
+                 "unimportant_budget", "unimportant_abort")
+
+voter <- voter_raw |>
+  mutate(
+    across(all_of(issue_items), \(x) na_if(x, 5)),   # 5 = Don't know
+    pol_interest = na_if(pol_interest, 4),           # 4 = Not sure
+    age = 2012 - birthyr
+  )
+```
+
+Three tools worth naming, because you'll encounter them often:
+
+- `across()` applies one computation to several columns instead of
+  copy-pasting the line four times.
+- `all_of()` says "these column names, as strings" — and errors loudly if one
+  does not exist, which is what you want from a typo.
+- `\(x) na_if(x, 5)` is an **anonymous function**: a throwaway function read as
+  "take a column `x`, return it with the 5s turned to `NA`."
+
+After this block `voter$important_econ` contains no 5s — those 39 responses
+have moved into the `NA` count.
+
+# Reverse-framed items
+
+This is the heart of today. Look closely at the wording of the four items:
+
+- `important_econ`: "The economy **is** an important issue"
+- `important_gayr`: "Gay rights **are** an important issue"
+- `unimportant_budget`: "The budget deficit **is not** an important issue"
+- `unimportant_abort`: "Abortion **is not** an important issue"
+
+For the first two, agreement means the issue matters to you. For the last two,
+agreement means it *does not*. Survey designers do this on purpose — it catches
+respondents who agree with everything without reading. But it means the four
+columns point in opposite directions, and averaging them as-is would be
+averaging north with south.
+
+The fix is to flip the reverse-framed items so that everywhere **low codes mean
+more importance**. On a 1–4 scale, the flip is `5 - x`:
+
+| Raw code | Raw meaning (on "is not important") | `5 - x` | Meaning after flip |
+|---|---|---|---|
+| 1 | Strongly agree it's *not* important | 4 | least importance |
+| 2 | Agree | 3 | |
+| 3 | Disagree | 2 | |
+| 4 | Strongly disagree it's *not* important | 1 | most importance |
+
+::: {.callout-warning}
+## Order of operations: flip *after* the Don't knows are gone
+
+We removed the 5s first, then flip. Do it in the other order and `5 - 5 = 0`
+manufactures a brand-new category that means nothing. Watch the disaster in
+miniature, on the raw data:
+
+```{r flip-too-early}
+voter_raw |>
+  mutate(oops = 5 - unimportant_budget) |>
+  count(oops)
+```
+
+Thirty-nine zeros: the Don't knows, laundered into what looks like a valid —
+even extreme — response. Zero *looks* like data. This is why cleaning steps
+have an order.
+:::
+
+## Flip, keeping the evidence
+
+We create **new** columns rather than overwriting the old ones. 
+
+```{r flip}
+voter <- voter |>
+  mutate(
+    important_budget = 5 - unimportant_budget,
+    important_abort  = 5 - unimportant_abort
+  )
+```
+
+Note the names: after flipping, these are importance items like the other two,
+so they get `important_*` names. A variable's name should describe what it
+*is*, not what it used to be.
+
+## Prove the flip worked
+
+The audit for any one-to-one recode is a crosstab of old against new:
+
+```{r flip-audit}
+voter |>
+  count(unimportant_budget, important_budget)
+```
+
+Exactly five rows, and only the legal pairs: 1↔4, 2↔3, 3↔2, 4↔1, and `NA`
+staying `NA`. Nothing leaked, nothing was invented. Substantively, read the big
+row: 5,027 people *strongly disagreed* that the deficit "is not an important
+issue" — a double negative the flip untangles into top-level importance.
+
+It's good practice to recode, then crosstab old against new.
+
+# Factors: labels beat magic numbers
+
+Six weeks from now, will you remember whether `gender == 2` meant "Woman" or
+"Man"? R's **factor** type attaches labels to the data itself, so the meaning
+travels with the numbers — and so your plot axes read in English.
+
+```{r factors}
+
+voter <- voter |>
+  mutate(
+    pid3_f = factor(pid3, levels = c(1, 2, 3),
+                    labels = c("Democrat", "Republican", "Other")),
+    
+    educ_f = factor(educ, levels = c(1, 2, 3, 4, 5, 6),
+                    labels = c("No HS", "HS grad", "Some college",
+                               "2-year", "4-year", "Post-grad"),
+                   ordered = TRUE)
+  )
+
+```
+
+Two details that matter. State `levels =` **explicitly** rather than letting R
+guess — if you omit it, R assigns labels to whatever values happen to appear,
+in sorted order, and a missing category silently shifts every label by one.
+And `educ_f` is an **ordered** factor, because education categories have a real
+order; `pid3_f` is not, because Democrat/Republican/Other do not.
+
+# The issue-importance index
+
+## Rescale each item to 0–1
+
+Our four cleaned items live on 1–4 where 1 = most important. The transform
+$(4 - x)/3$ sends 1 to 1 and 4 to 0, so on the new scale **1 means maximum
+importance**:
+
+```{r rescale}
+voter <- voter |>
+  mutate(
+    across(c(important_econ, important_gayr,
+             important_budget, important_abort),
+           \(x) (4 - x) / 3,
+           .names = "{.col}_01")
+  )
+```
+
+`.names = "{.col}_01"` tells `across()` to build *new* columns with `_01`
+bolted onto each name, instead of overwriting. And — you know the drill —
+audit one:
+
+```{r rescale-audit}
+voter |>
+  count(important_econ, important_econ_01)
+```
+
+$1 \mapsto 1$, $2 \mapsto 0.667$, $3 \mapsto 0.333$, $4 \mapsto 0$, `NA` stays
+`NA`. Four values in, four values out, direction reversed as intended.
+
+## Average the four items
+
+Averaging four noisy items lets item-specific noise partially cancel. One
+decision hides inside it: what score should someone who answered only two items
+get? We use **available-case** scoring (`na.rm = TRUE`) — average whatever a
+person answered — and record how many items that was:
+
+```{r index-build}
+voter <- voter |>
+  mutate(
+    n_items    = rowSums(!is.na(pick(ends_with("_01")))),
+    importance = rowMeans(pick(ends_with("_01")), na.rm = TRUE),
+    importance = if_else(is.nan(importance), NA, importance)
+  )
+
+count(voter, n_items)
+```
+
+
+
+# Plotting
+
+## The index
+
+```{r index-hist}
+
+voter |>
+  filter(!is.na(importance)) |>
+  ggplot(aes(x = importance)) +
+  geom_histogram(binwidth = 1/12, color = "black", 
+                 linewidth = 0.15, alpha = 0.8) +
+  labs(x = "Issue-importance index (0 = nothing important, 1 = everything)",
+       y = "Respondents",
+       title = "Respondents rate most issues important") +
+  theme_bw()
+
+```
+
+Two reading notes:
+
+- **The binwidth was a decision, not a default.** For complete responders the
+  index averages four values from $\{0, \tfrac13, \tfrac23, 1\}$, so it can only
+  land on multiples of $\tfrac1{12}$. Setting `binwidth = 1/12` shows the true
+  grid of scores instead of an artifact of bin placement. Try `binwidth = 0.07`
+  once and watch it lie to you.
+- **The shape is left-skewed**, with mean (0.70) below median (0.75) — the
+  mean-chases-the-tail behavior from lecture, pointing left. Behind the average
+  the items differ wildly: the economy averages 0.96 on the 0–1 scale, gay
+  rights 0.44. An index summarizes; it also blurs.
+
+## The index by party
+
+A boxplot shows distributions side by side. The box runs from
+$\hat{Q}_{0.25}$ to $\hat{Q}_{0.75}$, so its height is the IQR; the line inside
+is the median.
+
+```{r box-party}
+
+voter |>
+  filter(!is.na(pid3_f), !is.na(importance)) |>
+  ggplot(aes(x = pid3_f, y = importance)) +
+  geom_boxplot(width = 0.5,
+               alpha = 0.3, 
+               size = 0.5) +
+  labs(x = NULL, y = "Issue-importance index",
+       title = "Similar centers, similar spreads, a low tail everywhere") +
+  theme_bw()
+
+```
+
+Group means run 0.71 for Democrats, 0.70 for Republicans, 0.68 for Others — 
+real differences in this sample of 8,000, and small ones. Both halves of that 
+sentence belong in an honest write-up.
+
+# Exercises
+
+Fill in the blanks (`___`), run, and audit what you make. Fight with each for a
+few minutes before opening the solution.
+
+## Audit the second flip
+
+We proved the budget flip was clean but never checked the abortion item.
+Crosstab it, then say in one sentence what the biggest cell means
+substantively — remember it is a double negative.
+
+```{r ex1}
+#| eval: false
+voter |>
+  count(___, ___)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution: audit the second flip
+
+```{r ex1-sol}
+voter |>
+  count(unimportant_abort, important_abort)
+```
+
+Again only the four legal pairs plus `NA` staying `NA`. The big cell: 2,432
+people strongly disagreed that abortion "is not an important issue," which the
+flip untangles into maximum importance — so those 2,432 now sit at the top of
+the scale. Two audited flips, and in both cases the check took one line.
+:::
+
+## A terrible graph, redeemed
+
+Every sin below is one we warned against this week. Run the horror as given:
+
+```{r ex2-bad}
+#| fig-width: 7
+#| fig-height: 3
+#| fig-align: center
+awful <- voter |>
+  filter(!is.na(educ), !is.na(importance)) |>
+  group_by(educ) |>
+  summarise(m = mean(importance))
+
+ggplot(awful, aes(x = factor(educ), y = m, fill = factor(educ))) +
+  geom_col() +
+  coord_cartesian(ylim = c(0.69, 0.73)) +
+  labs(title = "importance by educ")
+```
+
+A reader skimming this concludes education *devastates* issue importance — the
+leftmost bar towers over the rightmost. The true range of means is 0.699 to
+0.724.
+
+**(a)** List at least four distinct problems. Be specific: "it's ugly" is not a
+problem; "the y-axis starts at 0.69, so bar heights exaggerate a 0.025
+difference" is.
+
+**(b)** Rebuild it honestly, using `educ_f`, a zero baseline, one color, and a
+title that states the finding.
+
+::: {.callout-tip collapse="true"}
+## Solution: a terrible graph, redeemed
+
+**(a)** The sins, itemized:
+
+1. **Truncated bar axis.** Bar *length* encodes value, so cutting the baseline
+   makes a 0.025 gap on a 0–1 scale look like a collapse. Bars start at zero.
+2. **Magic numbers on the axis.** Codes 1–6 send every reader to the codebook;
+   `educ_f` exists so they never have to.
+3. **Redundant color.** `fill = factor(educ)` encodes education twice — position
+   already does that job.
+4. **A legend duplicating the axis.** It repeats the x-axis labels, as codes,
+   spending a third of the panel on zero information.
+5. **Labels that say nothing.** "m" as an axis title, a variable dump as the
+   figure title.
+
+**(b)** The redemption:
+
+```{r ex2-sol}
+#| fig-width: 7.5
+#| fig-height: 3.4
+#| fig-align: center
+voter |>
+  filter(!is.na(educ_f), !is.na(importance)) |>
+  group_by(educ_f) |>
+  summarise(mean_importance = mean(importance)) |>
+  ggplot(aes(x = educ_f, y = mean_importance)) +
+  geom_col(fill = "#B31B1B", width = 0.65) +
+  geom_text(aes(label = sprintf("%.2f", mean_importance)),
+            vjust = -0.45, size = 3.2) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(x = NULL,
+       y = "Mean issue-importance index (0-1)",
+       title = "Mean issue importance is nearly flat across education")
+```
+
+Zero baseline, real category labels from the factor, one color and no legend,
+direct value labels, and a title that states the finding. Notice what the honest
+version reveals: **almost nothing is happening**. That flatness *is* the
+finding — the bad graph manufactured a story, the good one reports the truth,
+and the truth is allowed to be boring.
+:::
+
+# Checklist
+
+By the end of this lab you should be able to:
+
+- [ ] Recode disguised missing codes to `NA` with `na_if()`, using `across()`
+  and an anonymous function to treat several columns at once.
+- [ ] Explain why `5 - x` flips a 1–4 item, and why the flip must happen
+  *after* the Don't knows are removed.
+- [ ] Verify any one-to-one recode with a crosstab of old against new values.
+- [ ] Build labeled factors with explicit `levels =`, ordered where the
+  categories are ordered.
+- [ ] Rescale items to 0–1 with `(4 - x)/3` and `.names`, keeping originals
+  intact.
+- [ ] Build an additive index with `rowMeans()` + `pick()`, and state the
+  difference between available-case and listwise scoring.
+- [ ] Make a histogram and a grouped boxplot with binwidths and labels chosen
+  on purpose.
+- [ ] Diagnose a dishonest graph sin by sin, and fix it.
+
+Next week the data stop merely sitting there — we start asking where data
+*come from*, and that means probability.
