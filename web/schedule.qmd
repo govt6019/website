@@ -36,6 +36,8 @@ Materials appear here as we reach them.
 
 *Seminar Fri Sep 18 · Section Wed Sep 23*
 
+- [Slides (handout)](materials/lectures/slides_w03_handout.pdf)
+
 ### Week 4 — Expectation and the sample mean {#wk4}
 
 *Seminar Fri Sep 25 · Section Wed Sep 30*
