@@ -1,0 +1,266 @@
+---
+title: "{{< var course.code >}}: Homework 3 — Probability"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+# Part A — The rules of probability
+
+## Question 1: Two elections
+
+One registered voter is drawn at random from a county's voter file. Let $A$ be
+the event that they voted in the spring primary and $B$ the event that they
+voted in the November general election. In this county,
+
+$$
+\Prob(A) = .24, \qquad \Prob(B) = .62, \qquad \Prob(A \cap B) = .21 .
+$$
+
+a. State the sample space for this draw, and say what $A^c$ and $A \cap B$
+   each describe in words.
+
+b. Compute $\Prob(A \cup B)$.
+
+c. Compute the probability that the voter cast a ballot in neither election.
+
+d. Compute the probability that the voter cast a ballot in **exactly one** of
+   the two. Get to the answer twice: once from your answer to (b), and once by
+   computing $\Prob(A \cap B^c)$ and $\Prob(A^c \cap B)$ separately.
+
+e. A colleague building the same table reports $\Prob(A \cap B) = .30$
+   instead. Explain what the problem with that number is.
+
+## Question 2: Regimes and leader exits
+
+Country-years between 1946 and 2020 are cross-classified by regime type and by
+whether the sitting leader left office through irregular means — a coup, a
+forced resignation, an assassination. Treat the table as the joint
+distribution for one country-year drawn at random. (These proportions are
+stipulated for the exercise.)
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+ & Irregular exit & No irregular exit & \textbf{Total} \\
+\midrule
+Democracy & .002 & .548 & \textbf{.550} \\
+Autocracy & .018 & .432 & \textbf{.450} \\
+\midrule
+\textbf{Total} & \textbf{.020} & \textbf{.980} & \textbf{1.000} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+a. Report the two marginal distributions, and say which cells of the table you
+   summed to get each one.
+
+b. Compute $\Prob(\text{irregular} \mid \text{autocracy})$ and
+   $\Prob(\text{irregular} \mid \text{democracy})$.
+
+c. Compute $\Prob(\text{autocracy} \mid \text{irregular})$.
+
+d. Your answers to (b) and (c) are both about autocracy and irregular exits,
+   and they are far apart. Explain in two or three sentences what each one
+   measures, and which of the two answers the question "how dangerous is it to
+   be an autocrat?"
+
+e. Determine whether regime type and irregular exit are independent. Show the
+   comparison the definition requires.
+
+## Question 3: Two kinds of sampling
+
+**(i) An audit.** A county has 40 precincts, 6 of which contain a
+discrepancy between the machine count and the paper record. An audit selects 3
+precincts at random **without replacement**.
+
+a. Compute the probability that the first precinct selected contains a
+   discrepancy.
+
+b. Compute the probability that the first two both contain discrepancies.
+
+c. Compute the probability that **none** of the 3 selected precincts contains
+   a discrepancy, and then the probability that at least one does.
+
+d. Recompute (c) on the assumption that the three draws are made **with**
+   replacement. Report both numbers to three decimal places, say which
+   procedure is more likely to catch at least one discrepancy, and explain in
+   one sentence why the two answers differ.
+
+**(ii) Replications.** An early field experiment reports that door-to-door
+canvassing raises turnout. Five research teams set out to check the result.
+Each runs its own canvassing experiment in a different city, drawing its own
+random sample of households and running its own randomization.
+
+For this question, assume the original finding is correct: canvassing does
+raise turnout. Assume also that each team's experiment has an 80 percent
+chance of reproducing it, and that the five experiments are independent of one
+another. Call a team that reproduces the finding a **success**.
+
+e. Compute the probability that all five teams succeed.
+
+f. Compute the probability that at least one of the five does not.
+
+g. Compute the probability that all $k$ teams succeed for
+   $k = 5, 8, 10, 11, 12$. Then state the smallest $k$ for which that
+   probability falls below .10.
+
+h. The independence assumed here is a property of how these five experiments
+   were run, not a claim about how politics works. Say where it comes from,
+   then describe one concrete feature a set of replications could have that
+   would break it.
+
+# Part B — Bayes' rule
+
+## Question 4: Signature verification
+
+A county processes 200,000 mail ballots. One ballot in 10,000 carries a
+forged signature. The county's signature-matching system flags a forged
+signature with probability .95, and flags a legitimate signature as forged
+with probability .02.
+
+a. Let $F$ be the event that a ballot's signature is forged and $\text{Flag}$
+   the event that the system flags it. Write the quantity the county cares
+   about as a conditional probability, and write out Bayes' rule for it with
+   the denominator expanded.
+
+b. Compute $\Prob(F \mid \text{Flag})$.
+
+c. Redo the calculation in counts rather than probabilities. Of the 200,000
+   ballots, how many are forged, how many of those are flagged, how many
+   legitimate ballots are flagged, and how many ballots are flagged in total?
+   Confirm that the ratio of the relevant two counts reproduces your answer to
+   (b).
+
+d. The county tightens the system so that it flags a legitimate signature as
+   forged with probability .002, leaving everything else unchanged. Recompute
+   $\Prob(F \mid \text{Flag})$.
+
+e. Every flagged ballot is set aside until the voter is contacted and
+   confirms it. Using your counts from (c), write two or three sentences on
+   what the base rate implies for that process.
+
+# Part C — Random variables and distributions
+
+## Question 5: Three coin flips, one experiment
+
+A survey experiment has three subjects. Each subject is assigned to treatment
+or control by an independent flip of a fair coin. Let $X$ be the number of
+subjects assigned to treatment.
+
+If a part below has no appropriate answer, say so and explain why.
+
+a. List the sample space $\Omega$ of assignment outcomes, and give the
+   probability of each outcome.
+
+b. Give the value of $X$ for each outcome in $\Omega$, then write the
+   probability mass function $f(x) = \Prob(X = x)$ as a table.
+
+c. Confirm that your answer to (b) satisfies all three conditions in the
+   definition of a PMF.
+
+d. Write the cumulative distribution function $F(x) = \Prob(X \le x)$ at
+   $x = 0, 1, 2, 3$. Then give $F(1.5)$ and $F(-2)$.
+
+e. Give the probability density function of $X$.
+
+f. Name the distribution $X$ follows, with its parameters. (Hint: see slide
+   44 in the Week 3 lecture slides.)
+
+g. Compute the probability that the experiment assigns all three subjects to
+   the same condition. Then say, in one sentence, what that number implies
+   about assigning treatment by independent coin flips in an experiment this
+   small.
+
+# Part D — Applied: education and party in the VOTER data
+
+```{r}
+library(tidyverse)
+source("scripts/gov6019_ggplot.R")        # adjust to your project's layout
+voter <- read_csv("data/voter2012.csv")   # adjust to your project's layout
+```
+
+## Question 6: A joint distribution estimated from data
+
+Collapse `educ` into a binary variable separating respondents who completed a
+four-year degree or more from everyone else, then cross-classify by that
+variable and `pid3`. Drop rows missing either variable, and label both factors
+with words.
+
+a. Consult the codebook and say which values of `educ` you put on each side of
+   the cut. How many rows does the complete-case table contain, and how many
+   are dropped? Report how many of the dropped rows are missing `educ`, how
+   many are missing `pid3`, and how many are missing both. State the
+   assumption you make about those respondents by dropping them.
+
+b. Report the joint distribution as a 2 $\times$ 3 table of relative
+   frequencies over the complete cases, with row and column totals. Confirm
+   that the six cells sum to 1.
+
+c. Read $\Prob(\text{Democrat})$ and $\Prob(\text{BA or higher})$ off your
+   table, and say which cells you summed for each.
+
+d. Compute $\Prob(\text{Democrat} \mid \text{BA or higher})$ and
+   $\Prob(\text{Democrat} \mid \text{No BA})$ from the table. Then compute
+   $\Prob(\text{BA or higher} \mid \text{Democrat})$.
+
+e. Assess whether party identification and education are independent in this
+   sample. Compare the six joint relative frequencies against the six products
+   of the corresponding marginals, and report the largest discrepancy. Say
+   which cells are over-represented relative to independence and which are
+   under-represented.
+
+f. Your answer to (e) is a statement about 7,895 people who answered a survey
+   in 2012. Say what would have to be true for it to be a statement about the
+   American electorate, and name one quantity you would need in order to
+   decide whether a discrepancy of the size you found in (e) is more than an
+   artifact of which 8,000 people happened to be sampled.
+
+g. Make one figure showing the conditional distribution of party
+   identification given education. Label the factor levels with words, and
+   start any bars at zero. Add a two-sentence caption: the first sentence
+   states what the figure shows, the second states a limitation of the data
+   behind it.
+
+   The shares you plot are the ones from (d), not raw counts: the two
+   education groups differ in size, so counts are not comparable across them.
+
+   ```{r}
+   # within-group shares: count the cells, then divide by the group's own total
+   shares <- cc |>
+     count(ba_f, pid3_f) |>
+     group_by(ba_f) |>
+     mutate(share = n / sum(n)) |>
+     ungroup()
+
+   # side-by-side bars rather than stacked:
+   #   geom_col(position = position_dodge(width = 0.7), width = 0.6)
+   # percent labels on the y axis:
+   #   scale_y_continuous(labels = scales::label_percent(accuracy = 1))
+   # a title that states the finding, and no axis left unlabeled:
+   #   labs(title = "...", x = NULL, y = "...")
+   ```
+
+---
+
+*If you want more:* Blitzstein and Hwang, *Introduction to Probability*
+(free at <https://probabilitybook.net/>), chapters 1--3, covers Parts A--C
+at and somewhat beyond this level; Gailmard, ch. 3, is the assigned
+treatment; Tversky and Kahneman, "Judgment under Uncertainty: Heuristics and
+Biases," *Science* 185(4157), 1974, is the origin of the base-rate problem
+Question 4 sets up; and the Open Science Collaboration, "Estimating the
+Reproducibility of Psychological Science," *Science* 349(6251), 2015, is the
+study Question 3(ii) is modeled on.
