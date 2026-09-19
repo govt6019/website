@@ -14,6 +14,7 @@ materials/               everything for the course
   syllabus.pdf           the syllabus, start here
   lectures/              seminar slides, as PDF (slides_w01.pdf, ...)
   discussion_section/    Wednesday lab materials, Quarto source and HTML
+  handouts/              reference handouts, as PDF
   homework/              weekly problem sets, Quarto source and PDF
   data/                  relevant data for the class
   scripts/               gov6019_ggplot.R, the course figure theme, and other scripts

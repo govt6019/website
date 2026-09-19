@@ -43,6 +43,8 @@ Materials appear here as we reach them.
 
 *Seminar Fri Sep 25 · Section Wed Sep 30*
 
+- [Distributions handout](materials/handouts/handout_distributions.pdf)
+
 ## Unit 3 · Estimation and inference
 
 ### Week 5 — Estimation and large samples {#wk5}
