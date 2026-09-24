@@ -39,6 +39,7 @@ Materials appear here as we reach them.
 
 - [Slides (handout)](materials/lectures/slides_w03_handout.pdf)
 - [Problem set 3](materials/homework/hw_w03.pdf)
+- [Practice problems (bayes rule)](../materials/discussion_section/bayes_rule.pdf)
 
 ### Week 4 — Expectation and the sample mean {#wk4}
 
