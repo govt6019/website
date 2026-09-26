@@ -48,6 +48,7 @@ Materials appear here as we reach them.
 
 - [Slides (handout)](materials/lectures/slides_w04_handout.pdf)
 - [Distributions handout](materials/handouts/handout_distributions.pdf)
+- [Problem set 4](materials/homework/hw_w04.pdf)
 
 ## Unit 3 · Estimation and inference
 
