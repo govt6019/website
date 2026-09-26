@@ -1,0 +1,272 @@
+---
+title: "{{< var course.code >}}: Homework 4 — Expectation"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+<!-- IN PROGRESS. The set is being built up as Week 4 is drafted; more
+questions to come. Five placed as of 2026-09-25.
+
+Q4 "Unseen vignettes" was added 2026-09-22 (user instruction). It practises
+indicator variables, P(A) = E[I_A], and linearity without independence. It is
+the birthday problem with the days replaced by vignette versions.
+
+Q1 "Name the distribution" is inherited verbatim from hw_w03 Q6, moved here on
+2026-09-19. It tests the W3 discrete zoo and sets up the "From Bernoulli
+to binomial" frame in the W4 deck. It opens the set as a review item on user
+instruction, 2026-09-21.
+
+Q2 must NOT name Simpson's paradox anywhere in the prompt. Part (g) is the
+whole point of the question and is spoiled by naming it earlier. See
+_HELD-FOR-MIDTERM.md and _NOTES-FOR-2027.md.
+
+Q2(e) is written in sample notation only. E[Y|X] and the law of iterated
+expectations left the W4 deck for Week 5 on 2026-09-21, so students have not
+met that notation when this set is due. Do not "improve" it back.
+
+Q3(g) was added 2026-09-25 (user instruction) when the "Shifting and
+rescaling" frame was cut from the deck. Students derive E[a + bU] = a + bE[U]
+from the three properties; the old (g) became (h) and uses that result.
+
+Q5 "Contact and turnout" was added 2026-09-25 (user instruction) as Part E.
+It covers the Variance and covariance section of the deck. The normal
+distribution, pnorm and qnorm are held for Homework 5, after the CLT.
+
+Solutions: hw_w04_solutions.qmd, which must be kept in step with this file. -->
+
+# Part A — Review: naming a distribution
+
+## Question 1: Name the distribution
+
+For each scenario, name the distribution the random variable follows and give
+its parameters, with one sentence of justification.
+
+i. A state statute requires that the order of the 7 candidates on the ballot
+   be randomized, with every ordering equally likely. $X$ is the ballot
+   position assigned to one named candidate.
+
+ii. One voter is sampled at random from a district. $X = 1$ if they support
+    the incumbent and $X = 0$ otherwise.
+
+iii. Fifteen voters are sampled independently at random from a district in
+     which 40 percent of voters support the incumbent. $X$ is the number of
+     sampled voters who support the incumbent.
+
+iv. Motions of no confidence are tabled in a parliament at an average rate of
+    1.5 per year. $X$ is the number tabled in a given year.
+
+Then compute the following.
+
+a. For (i): the probability that the named candidate is assigned the top
+   position, and the probability that they are assigned one of the top two.
+
+b. For (iii) with four sampled voters rather than fifteen: list every sequence
+   of four responses containing exactly two supporters, count them, and
+   confirm your count against $\binom{4}{2}$. Then compute
+   $\Prob(X = 2)$ by hand.
+
+c. For (iii) as stated, with fifteen sampled voters: compute $\Prob(X = 6)$
+   and $\Prob(X \le 5)$ in R.
+
+   ```{r}
+   # dbinom() gives the PMF; pbinom() gives the CDF
+   ```
+
+# Part B — Conditioning and pooled comparisons
+
+## Question 2: Two ways to reach the hospital
+
+A regional trauma registry records every patient transported to hospital after
+a road accident, the mode of transport, the severity of the accident, and
+whether the patient died. Accidents are classified as serious or less serious
+at the scene, before transport is chosen. (The counts are stipulated for the
+exercise.)
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Deaths / patients & Serious & Less serious & \textbf{All} \\
+\midrule
+Helicopter & 48/100 & 16/100 & \textbf{64/200} \\
+Ambulance  & 60/100 & 200/1000 & \textbf{260/1100} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Let $Y = 1$ if a patient died and $Y = 0$ otherwise. Let $X$ denote severity,
+taking the values serious and less serious.
+
+a. Compute $\bar Y$ for each mode of transport within each severity group.
+   State which mode has the lower death rate among serious accidents, and
+   which has the lower death rate among less serious accidents.
+
+b. Compute $\bar Y$ for each mode of transport across all its patients. State
+   which mode has the lower death rate overall.
+
+c. Your answers to (a) and (b) disagree. Before explaining why, write each of
+   the two pooled rates in (b) as a weighted average of that mode's two group
+   rates from (a). Give the four weights as fractions, and say what each
+   weight is the proportion of.
+
+d. The two modes have different weights. Name the feature of the transport
+   system that produces that difference, using the sentence in the problem
+   about when severity is assessed.
+
+e. Lecture wrote a pooled mean as
+   $\bar Y = \sum_x \bar Y_{X=x}\,\hat p(x)$. Using that expression, state the
+   two things that can differ between two groups of patients with different
+   pooled rates. Say which one differs here.
+
+f. A newspaper reports the two numbers from (b) under the headline
+   "Helicopter transport saves lives." State the question that comparison
+   actually answers, and the question a reader takes it to answer.
+
+g. This problem demonstrates a paradox that was discussed in Week
+   {{< var wk.data >}}. Name it. The Week {{< var wk.data >}} example concerned
+   income and vote choice measured on individuals and on states. State what
+   that example and this one have in common, in terms of $X$, $Y$, and the
+   weights in (c).
+
+# Part C — Expected utility
+
+## Question 3: The utility of voting
+
+Lecture put a decision model to a pedestrian choosing between jaywalking and
+waiting. Put the same model to a citizen choosing between voting and
+abstaining on election day.
+
+A citizen prefers one of the two candidates. Voting costs them $C = 5$, paid
+with certainty: the travel, the queue, the time off work. The vote changes the
+outcome of the election only if it is decisive, which occurs with probability
+$p$. If the vote is decisive, the citizen's preferred candidate takes office
+instead of the other one, which they value at $B = 500$. Abstaining costs
+nothing and changes nothing. Take $p = 1/50{,}000$.
+
+a. Let $U_{\text{vote}}$ be the citizen's utility from voting. Write it as a
+   random variable: give the two values it takes and the probability of each.
+   Do the same for $U_{\text{abstain}}$.
+
+b. Compute $\E[U_{\text{vote}}]$ and $\E[U_{\text{abstain}}]$. State which
+   action the model predicts.
+
+c. Rewrite $\E[U_{\text{vote}}]$ and $\E[U_{\text{abstain}}]$ in the
+   parameters $p$, $B$ and $C$. Give the condition on those three quantities
+   under which the model predicts voting.
+
+d. Solve that condition with equality for $p$. Report the value of $p$ at
+   which the citizen is indifferent, given the $B$ and $C$ above. One vote in
+   a national electorate is decisive with probability on the order of
+   $10^{-7}$. State what the model predicts for such an electorate.
+
+e. The model in (c) predicts near-universal abstention, and turnout in
+   national elections is not near zero. One repair adds a term $D$, the
+   utility of the act of voting itself, received whether or not the vote is
+   decisive:
+   $$
+   \E[U_{\text{vote}}] = pB - C + D .
+   $$
+   Give the condition on $D$ under which the model predicts voting, and
+   compute the threshold value of $D$ using the numbers above.
+
+f. Each of $p$, $B$, $C$ and $D$ differs across citizens. State in one
+   sentence what a model of this form predicts about turnout across a
+   population.
+
+g. Lecture gave three properties of expectation: $\E[c] = c$;
+   $\E[cX] = c\,\E[X]$; and $\E[X + Y] = \E[X] + \E[Y]$. Using only these,
+   show that $\E[a + bU] = a + b\,\E[U]$ for any constants $a$ and $b$. Write
+   one step per line. Name the property each step uses.
+
+h. Suppose every citizen's utility is measured on a new scale,
+   $U' = a + bU$ with $b > 0$, applied to both actions. Using the result in
+   (g), show that the action the model predicts in (c)
+   is unchanged. Then state why adding a constant to the utility of voting
+   alone is a different operation, and name the term in (e) that performs it.
+
+# Part D — Indicator variables
+
+## Question 4: Unseen vignettes
+
+A survey experiment has $k = 10$ versions of a vignette. Each of $n = 20$
+respondents is assigned one version, independently and uniformly at random.
+
+a. For version $j$, define $I_j = 1$ if no respondent sees version $j$, and
+   $I_j = 0$ otherwise. Find $\Prob(I_j = 1)$ and $\E[I_j]$.
+
+b. Let $U$ be the number of versions that no respondent sees. Write $U$ as a
+   sum of the indicators in (a), and find $\E[U]$.
+
+c. Are $I_1$ and $I_2$ independent? Explain why your answer to (b) does not
+   depend on the answer.
+
+d. For each pair of respondents, define an indicator equal to 1 if the two
+   saw the same version. Find the expected number of pairs who saw the same
+   version.
+
+e. Simulate the assignment 10,000 times in R. Compare the mean of $U$ with
+   your answer to (b). Report the share of simulated experiments in which at
+   least one version goes unseen.
+
+   ```{r}
+   # sample(1:10, 20, replace = TRUE) assigns 20 respondents to 10 versions
+   # replicate() repeats an expression; unique() lists the versions that appear
+   ```
+
+# Part E — Variance and covariance
+
+## Question 5: Contact and turnout
+
+A campaign's field team contacts some registered voters before an election.
+For a registered voter drawn at random, let $C = 1$ if the voter was contacted
+and $C = 0$ otherwise. Let $T = 1$ if the voter turned out and $T = 0$
+otherwise. The joint distribution is below. (The probabilities are stipulated
+for the exercise.)
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+ & $T = 0$ & $T = 1$ \\
+\midrule
+$C = 0$ & .30 & .40 \\
+$C = 1$ & .05 & .25 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+a. Find $\E[C]$. Find $\V[C]$ from the definition
+   $\V[X] = \sum_i p_i\,(x_i - \mu)^2$. Check your answer against the
+   Bernoulli variance from lecture.
+
+b. Find $\V[T]$ using the computational identity
+   $\V[X] = \E[X^2] - (\E[X])^2$. Explain why $\E[T^2] = \E[T]$ for any
+   indicator $T$.
+
+c. Show that $\Cov(C, T) = \E[CT] - \E[C]\,\E[T]$, following the steps
+   lecture used for the computational identity. Then compute $\Cov(C, T)$.
+   Campaigns choose whom to contact. Name one way they choose that would
+   produce this covariance even if contact had no effect on turnout.
+
+d. Let $K = C + T$. Find $\V[K]$ using the variance of a sum. Then find the
+   distribution of $K$ directly and confirm your answer. Report the value of
+   $\V[K]$ you would get by wrongly treating $C$ and $T$ as independent.
+
+e. A survey records a respondent's self-placement as $X = -1$ (left), $0$
+   (centre) or $1$ (right), each with probability $1/3$. Let $Y = X^2$. $Y$
+   equals 1 if the respondent takes a side and 0 if they place themselves at
+   the centre. Show that $\Cov(X, Y) = 0$. Then show that $X$ and $Y$ are not
+   independent by finding values $x$ and $y$ with
+   $\Prob(X = x, Y = y) \neq \Prob(X = x)\,\Prob(Y = y)$.
