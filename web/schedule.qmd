@@ -57,6 +57,9 @@ Materials appear here as we reach them.
 
 *Seminar Fri Oct 2 · Section Wed Oct 7*
 
+- [Slides (handout)](materials/lectures/slides_w05_handout.pdf)
+- [Rolling dice activity](materials/handouts/handout_clt_dice.pdf)
+
 ### Week 6 — Inference {#wk6}
 
 *Seminar Fri Oct 9 · Section Wed Oct 14*
