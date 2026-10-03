@@ -1,0 +1,374 @@
+---
+title: "{{< var course.code >}}: Homework 5 — Estimation and Large Samples"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+<!-- Nine questions, in lecture order (reordered 2026-09-27, user instruction:
+the order should follow the material, not the order questions were written).
+
+Part A reviews the W4 continuous-distribution material held over from
+Homework 4 (plan_w05.md). Q1 is the uniform and what a density is. Q2 is the
+normal, standardization, 68/95/99.7, pnorm/qnorm. Its two die-roll parts were
+cut 2026-09-27. They repeated Q5(c) and Q6(e).
+
+Q3 is conditional expectation and the law of iterated expectations, added
+2026-10-01 (user instruction). The table has no reversal, so it does not
+spoil the held midterm question (_HELD-FOR-MIDTERM.md). E[Y] = .73.
+
+Q4 replaces the deck frames "Where Bernoulli variance is largest" and "A bound
+on SD[X-bar] for a proportion". Students reach p(1 - p) <= .25 by completing
+the square, no calculus. Week {{ wk.inference }} finishes it: 1.96 x .016 =
+.031.
+
+Q5 calls back to the in-class dice activity (course/handouts/
+handout_clt_dice.qmd), which pairs ran by hand with no pooling. A pair's count
+of means within one SD[X-bar] of mu varies by chance. That count is
+Binomial(40, 884/1296), mean 27.3, SD 2.9. The exact .682 is a property of the
+distribution, not of any one sheet.
+
+Q6 is the skewed-population CLT demonstration. Lognormal(4, 1): median
+$54.60, mean $90.02, SD $118.00. The share of sample means below mu runs about
+.69, .59, .54, .50 at n = 1, 10, 100, 1000.
+
+Q7 is Gailmard's CLT application, pp. 202-203 (resources/textbook/
+IMG_1596.jpeg): India's 2009 births, 47 percent girls against p = .487. Added
+2026-10-01 (user instruction). No Chebyshev; the deck does not teach it.
+Parts (c)-(g) go beyond the book: pnorm underflow, simulation, the role of n,
+twins and the covariance term, and two counts of the missing girls.
+
+Q8 covers bias, efficiency, error, MSE and consistency on five estimators of
+a share, added 2026-10-01 (user instruction). theta = .50 on purpose: at
+.30 the first-four share can never land within .02 of theta. Part (f) is the
+epsilon definition of convergence in probability with epsilon = .02.
+
+Q9 replaces three deck frames on n vs. n - 1. Students derive E[SSD] =
+(n - 1) sigma^2 and find that the biased sigma-hat^2 has the lower MSE
+(_NOTES item 6).
+
+Solutions: hw_w05_solutions.qmd, which must be kept in step with this file.
+Each solution sets its own seed, so questions can be reordered freely. -->
+
+# Part A — Continuous distributions and the normal
+
+## Question 1: Arrival times at a polling place
+
+A polling place is open for 13 hours. Let $X$ be the time, in hours after
+opening, at which a randomly chosen voter arrives. Suppose
+$X \sim \mathcal{U}(0, 13)$.
+
+a. Write down the density $f(x)$ of $X$. Show that the total area under it
+   is 1.
+
+b. What is $\Prob(X = 5)$? Explain.
+
+c. Find the probability that a voter arrives in the last two hours the polls
+   are open. Compute it by hand and with `punif()`.
+
+d. Write down the CDF $F(x)$. Find the median arrival time: the $x$ with
+   $F(x) = .5$. Check your answer with `qunif()`.
+
+e. Draw 10,000 arrival times with `runif()`. Report the share that fall in
+   the last two hours and compare it with part (c).
+
+f. The density of $X$ is $1/13$ on the interval. The density of
+   $\mathcal{U}(0, 0.5)$ is 2 on its interval. Can a probability equal 2?
+   Explain what the height of a density is, if it is not a probability.
+
+## Question 2: County turnout
+
+Suppose turnout across counties, in percentage points, is approximately
+$\mathcal{N}(60, 10^2)$. Let $X$ be the turnout of a randomly chosen county.
+
+a. Standardize $X$ at $x = 75$. Use `pnorm()` to find $\Prob(X > 75)$ twice:
+   once from the standardized value, once by passing `mean` and `sd` to
+   `pnorm()`. Confirm that the answers agree.
+
+b. Find $\Prob(40 \le X \le 80)$. Which part of the 68–95–99.7 rule does it
+   correspond to?
+
+c. Without R, use the 68–95–99.7 rule to give the share of counties with
+   turnout between 50 and 70, and the share with turnout above 90.
+
+d. Use `qnorm()` to find the turnout below which the lowest 10 percent of
+   counties fall. Then find the interval, centered on 60, that contains the
+   middle 95 percent of counties.
+
+e. Let $X \sim \mathcal{N}(\mu, \sigma^2)$ and $Z = (X - \mu)/\sigma$. Use the
+   rules for $\E[a + bX]$, $\V[X + c]$ and $\V[cX]$ from Week {{< var wk.expectation >}} to
+   show that $\E[Z] = 0$ and $\V[Z] = 1$.
+
+# Part B — Conditional expectation
+
+## Question 3: Interest and participation
+
+A survey records each respondent's political interest $X$ (low, medium or
+high) and the number of political acts $Y$ they took last year, such as
+contacting an official or attending a meeting. $Y$ is coded 0, 1, or 2 for
+two or more. In the population, $\Prob(X = \text{low}) = .40$,
+$\Prob(X = \text{medium}) = .45$ and $\Prob(X = \text{high}) = .15$. The
+conditional distribution of $Y$ given $X$ is below. (The probabilities are
+stipulated for the exercise.)
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+ & $Y = 0$ & $Y = 1$ & $Y = 2$ \\
+\midrule
+low & .70 & .20 & .10 \\
+medium & .40 & .40 & .20 \\
+high & .10 & .40 & .50 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+a. Find $\E[Y \mid X = x]$ for each level of interest.
+
+b. $\E[Y \mid X]$ is a random variable. List the values it takes and the
+   probability of each. A respondent has not yet been drawn. What is the
+   probability that $\E[Y \mid X] = 1.4$?
+
+c. Use the law of iterated expectations to find $\E[Y]$.
+
+d. Find the marginal distribution of $Y$, $\Prob(Y = y)$ for $y = 0, 1, 2$,
+   from the table and the probabilities of $X$. Compute $\E[Y]$ from it and confirm your answer to
+   part (c).
+
+# Part C — The variance of a sample proportion
+
+## Question 4: The variance of a sample proportion
+
+Let $X$ be a Bernoulli variable with $\Prob(X = 1) = p$. From Week
+{{< var wk.expectation >}}, $\V[X] = p(1 - p)$. A poll records $n$ independent
+draws of $X$ and reports the sample proportion $\bar X$.
+
+a. Plot $\V[X] = p(1 - p)$ for $p$ between 0 and 1. At which $p$ is it
+   largest? What is its largest value?
+
+b. Show that $p(1 - p) = .25 - (p - .5)^2$. Use this identity to show that
+   $p(1 - p) \le .25$ for every $p$.
+
+c. Write $\text{SD}[\bar X]$ as a function of $p$ and $n$. Give an upper bound
+   on $\text{SD}[\bar X]$ that holds at every $p$.
+
+d. A pollster fixes $n = 1{,}000$ before knowing $p$. Compute the bound from
+   part (c). Compute the true $\text{SD}[\bar X]$ at $p = .38$ and at
+   $p = .05$. By how much does the bound exceed each, as a difference and as a
+   ratio?
+
+e. Simulate 5,000 polls of $n = 1{,}000$ at $p = .5$, and 5,000 more at
+   $p = .05$. For each $p$, report the standard deviation of the 5,000 sample
+   proportions. Compare it with your answers to parts (c) and (d).
+
+f. What $n$ brings the bound from part (c) down to .01?
+
+# Part D — The law of large numbers and the central limit theorem
+
+## Question 5: Rolling dice in R
+
+In class, each pair rolled a die four times, recorded the sum of the four
+rolls, repeated this 40 times, and marked each sum on a dot plot. The axis
+also showed the mean of the four rolls: the sum divided by 4. Let
+$\bar X$ be the mean of four independent rolls of a fair die. From lecture,
+$\mu = 3.5$, $\sigma = \sqrt{35/12} \approx 1.708$, and
+$\text{SD}[\bar X] = \sigma/\sqrt 4 \approx 0.854$.
+
+a. Write a function `trial()` that simulates one trial and returns the mean
+   of the four rolls. Use `sample()`.
+
+b. Run 40 trials. Plot the 40 means with one bar for each possible value of
+   $\bar x$. Count how many of the 40 means fall between 2.75 and 4.25
+   inclusive.
+
+c. The values of $\bar x$ from 2.75 to 4.25 are exactly those within
+   $0.854$ of $\mu$. Enumerate all $6^4 = 1{,}296$ equally likely outcomes of
+   four rolls with `expand_grid()`, and compute the exact probability that
+   $\bar X$ falls between 2.75 and 4.25. Compare it with the probability a
+   normal distribution places within one standard deviation of its mean.
+
+d. Let $K$ be the number of the 40 trials that fall between 2.75 and 4.25.
+   Name the distribution of $K$ and give its parameters. Find $\E[K]$ and
+   $\text{SD}[K]$.
+
+e. Repeat the 40-trial experiment of part (b) 1,000 times, recording $K$
+   each time. Plot the distribution of the 1,000 values of $K$. Report their
+   mean and standard deviation and compare them with part (d). What share of
+   the 1,000 values are 24 or fewer?
+
+f. Run 10,000 trials instead of 40. Report the share of the 10,000 means that
+   fall between 2.75 and 4.25. Name the result that describes how this share
+   behaves as the number of trials grows.
+
+## Question 6: Small donations
+
+Individual contributions to a campaign, in dollars, follow a lognormal
+distribution: $X = e^W$ with $W \sim \mathcal{N}(4, 1)$. In R the draw is
+`rlnorm(n, meanlog = 4, sdlog = 1)`. The population mean is
+$\mu = e^{4.5} \approx 90.02$ and the population standard deviation is
+$\sigma \approx 118.00$.
+
+a. Draw 100,000 contributions. Plot their histogram and report their mean and
+   median. Describe the shape of the distribution. Explain why the mean
+   exceeds the median.
+
+b. For each of $n = 1, 10, 100, 1000$, draw 5,000 samples of size $n$ and
+   record the mean of each sample. Plot the four sets of sample means as four
+   histograms, one per $n$. On each, overlay the density of
+   $\mathcal{N}(\mu, \sigma^2/n)$.
+
+c. For each $n$, report the mean of the 5,000 sample means, their standard
+   deviation, and $\sigma/\sqrt n$. Compare the mean of the sample means
+   with $\mu$, and their standard deviation with $\sigma/\sqrt n$. Do they
+   agree at every $n$? Which results from lecture guarantee the agreement?
+
+d. For each $n$, report the share of the 5,000 sample means that fall below
+   $\mu$. What would this share be if the sampling distribution were normal?
+   Explain why the share exceeds that value at small $n$.
+
+e. Standardize each sample mean: $Z = (\bar X - \mu)/(\sigma/\sqrt n)$. For
+   each $n$, report the share of the $Z$ values with $|Z| \le 1$, and the 2.5th
+   and 97.5th percentiles of $Z$. Compare them with
+   `pnorm(1) - pnorm(-1)` and `qnorm(c(.025, .975))`.
+
+f. In class, the mean of four dice already had a roughly normal
+   distribution. Here the mean of ten contributions does not. Name the
+   feature of the two populations that accounts for the difference.
+
+g. **Beyond the lecture.** Repeat the simulation of part (b), without the
+   normal overlay, with draws from `rcauchy(n)`, the standard Cauchy
+   distribution. A few Cauchy means are enormous, so plot only the means
+   between $-10$ and $10$ (`filter(abs(xbar) < 10)`), and report the
+   quartiles of the sample means at each $n$. Describe how the distribution
+   of the sample mean changes with $n$. The Cauchy distribution has no finite mean and no finite
+   variance. State which assumption of the central limit theorem fails.
+
+## Question 7: India's missing girls
+
+Across human populations, the probability that a birth is a girl is stable at
+about $p = .487$. In India in 2009 there were roughly 15 million births. About
+47 percent of them were girls (Gailmard, pp. 202--203).
+
+Model each birth as an independent Bernoulli draw: $X_i = 1$ if birth $i$ is a
+girl, with $\Prob(X_i = 1) = .487$. Let $\bar X$ be the share of girls among
+$n = 15{,}000{,}000$ births.
+
+a. Find $\E[\bar X]$ and $\text{SD}[\bar X]$. Compare $\text{SD}[\bar X]$ with
+   the bound from Question 4(c).
+
+b. Use the central limit theorem to give the approximate distribution of
+   $\bar X$. Standardize the observed $\bar x = .47$. How many standard
+   deviations does it lie from $\E[\bar X]$?
+
+c. Compute $\Prob(\bar X \le .47)$ with `pnorm()`. R returns 0. Is the
+   probability exactly zero? Explain what R's answer means. Hint: the
+   smallest positive number R can store is about $10^{-308}$.
+
+d. Simulate 10,000 values of $\bar X$ with
+   `rbinom(10000, size = 15e6, prob = .487) / 15e6`. Report the smallest and
+   largest of the 10,000 values and compare them with .47.
+
+e. The same 47 percent can come from samples of different sizes. For
+   $n = 1{,}000$, $4{,}000$ and $10{,}000$ births, compute
+   $\Prob(\bar X \le .47)$ under the model. What is the smallest $n$ at which
+   .47 lies at least 2 standard deviations below .487?
+
+f. The model assumes the births are independent. Identical twins are always
+   the same sex. Use the formula for the variance of a sum from lecture to say
+   whether twins make $\V[\bar X]$ larger or smaller than $p(1 - p)/n$. By what
+   factor would $\text{SD}[\bar X]$ have to grow for .47 to lie 2 standard
+   deviations below .487? Can twins account for the gap?
+
+g. How many girls are "missing"? Compute two counts:
+   (i) the expected number of girls among 15 million births, minus the
+   observed number;
+   (ii) the number of girls expected alongside the observed number of boys,
+   minus the observed number of girls.
+   The two answers differ by about a factor of two. Explain which assumption
+   about the missing births each count makes.
+
+h. The calculation shows that 2009's births did not come from a process with
+   $p = .487$. It does not say why. Name two processes that could produce a
+   recorded share of .47.
+
+# Part E — Estimators and their properties
+
+## Question 8: Five estimators of a share
+
+A pollster wants $\theta$, the share of voters who support a ballot measure.
+Suppose $\theta = .50$. The poll draws $n$ voters independently, with
+$X_i = 1$ if voter $i$ supports the measure and $X_i = 0$ otherwise. Consider
+five estimators:
+
+- $\hat\theta_A = \bar X_n$, the share in the whole sample;
+- $\hat\theta_B$, the share among the first 4 respondents;
+- $\hat\theta_C$, the share among the first 10 respondents;
+- $\hat\theta_D = \bar X_n + 1/n$;
+- $\hat\theta_E = \bar X_n + .05$.
+
+a. Find the expected value and the bias of each estimator. Which are
+   unbiased?
+
+b. Find the variance of each estimator, as a function of $\theta$ and $n$.
+
+c. Rank the unbiased estimators by efficiency, for $n \ge 10$.
+
+d. At $n = 100$, compute the MSE of each estimator. Name a biased estimator
+   with a smaller MSE than an unbiased one.
+
+e. One poll of $n = 100$ gives $\hat\theta_A = .54$. What is the error of this
+   estimate? Does it show that $\hat\theta_A$ is biased? Why can a pollster
+   not compute the error of a real poll?
+
+f. For each of $n = 10, 100, 1{,}000, 10{,}000$, simulate 5,000 polls. For
+   each estimator and each $n$, report the share of the 5,000 estimates that
+   lie within .02 of $\theta$, that is, with
+   $|\hat\theta - \theta| \le .02$. Which shares go to 1 as $n$ grows?
+   Which estimators are consistent?
+
+   Two hints. In R, `0.52 - 0.5 <= 0.02` is `FALSE`, because decimals are
+   stored with tiny rounding errors. Test
+   `round(abs(est - theta), 10) <= 0.02` instead. To keep the simulation
+   fast, draw the first 10 respondents of each poll one at a time, and draw
+   the number of supporters among the other $n - 10$ with
+   `rbinom(5000, n - 10, theta)`.
+
+## Question 9: Dividing by $n$ or by $n - 1$
+
+Week {{< var wk.description >}} defined the sample variance with the divisor
+$n - 1$. This question shows why, and what the other divisor would buy. Let
+$X_1, \dots, X_n$ be iid with mean $\mu$ and variance $\sigma^2$. Let
+$\text{SSD} = \sum_i (X_i - \bar X)^2$ be the sum of squared deviations from
+the sample mean.
+
+a. Show that $\text{SSD} = \sum_i X_i^2 - n\bar X^2$.
+
+b. Use $\E[W^2] = \V[W] + (\E[W])^2$ to find $\E[X_i^2]$ and $\E[\bar X^2]$
+   in terms of $\mu$, $\sigma^2$ and $n$.
+
+c. Show that $\E[\text{SSD}] = (n - 1)\,\sigma^2$.
+
+d. Two estimators of $\sigma^2$ are $s^2 = \text{SSD}/(n - 1)$ and
+   $\hat\sigma^2 = \text{SSD}/n$. Find the expected value of each. Which is
+   unbiased? What is the bias of the other?
+
+e. Simulate 100,000 samples of $n = 10$ from $\mathcal{N}(0, 1)$, so
+   $\sigma^2 = 1$. For each sample compute $s^2$ and $\hat\sigma^2$. For each
+   estimator, report its bias, its variance and its MSE. Which has the smaller
+   MSE?
+
+f. Give one reason to prefer $s^2$ and one reason to prefer $\hat\sigma^2$.
+   What happens to the difference between them as $n$ grows?
