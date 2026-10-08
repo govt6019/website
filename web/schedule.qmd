@@ -71,6 +71,8 @@ Materials appear here as we reach them.
 
 *Fall Break, Sat Oct 10 – Tue Oct 13.*
 
+- [Slides (handout)](materials/lectures/slides_w06_handout.pdf)
+
 ### Week 7 — Midterm exam {#wk7}
 
 *In class, Fri Oct 16 · Section Wed Oct 21*
