@@ -63,7 +63,7 @@ Materials appear here as we reach them.
 - [Rolling dice activity](materials/handouts/handout_clt_dice.pdf)
 - [Rolling dice activity solutions](materials/handouts/handout_clt_dice_solutions.pdf)
 - [Problem set 5](materials/homework/hw_w05.pdf)
-- [Discussion section 5](materials/discussion_section/lab_w05.qmd)
+- [Discussion section 5](materials/discussion_section/summarizing_distributions.qmd)
 
 ### Week 6 — Inference {#wk6}
 
