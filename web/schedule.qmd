@@ -76,6 +76,7 @@ Materials appear here as we reach them.
 - [Problem set 6](materials/homework/hw_w06.pdf)
 - [Problem set 6 solutions](materials/homework/hw_w06_solutions.pdf)
 - [Practice midterm](materials/discussion_section/practice_midterm.pdf)
+- [Practice midterm solutions](materials/homework/practice_midterm_solutions.pdf)
 
 ### Week 7 — Midterm exam {#wk7}
 
