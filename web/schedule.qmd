@@ -90,6 +90,8 @@ Covers Weeks 1–6: data through inference.
 
 *Seminar Fri Oct 23 · Section Wed Oct 28*
 
+- [Least squares derivation handout](materials/handouts/handout_ols_derivation.pdf)
+
 ### Week 9 — Linear regression II {#wk9}
 
 *Seminar Fri Oct 30 · Section Wed Nov 4*
