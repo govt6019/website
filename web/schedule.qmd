@@ -92,6 +92,7 @@ Covers Weeks 1–6: data through inference.
 
 - [Slides (handout)](materials/lectures/slides_w08_handout.pdf)
 - [Least squares derivation handout](materials/handouts/handout_ols_derivation.pdf)
+- [Problem set 8](materials/homework/hw_w08.pdf)
 
 ### Week 9 — Linear regression II {#wk9}
 
