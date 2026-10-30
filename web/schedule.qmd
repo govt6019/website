@@ -93,6 +93,8 @@ Covers Weeks 1–6: data through inference.
 - [Slides (handout)](materials/lectures/slides_w08_handout.pdf)
 - [Least squares derivation handout](materials/handouts/handout_ols_derivation.pdf)
 - [Problem set 8](materials/homework/hw_w08.pdf)
+- [Problem set 8 data (ANES 2024 work hours)](materials/data/anes2024_work.csv)
+- [ANES 2024 work hours codebook](materials/data/anes2024_work_codebook.md)
 
 ### Week 9 — Linear regression II {#wk9}
 
