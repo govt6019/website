@@ -103,6 +103,7 @@ Covers Weeks 1–6: data through inference.
 - [Slides (handout)](materials/lectures/slides_w09_handout.pdf)
 - [Omitted variable bias handout](materials/handouts/handout_ovb.pdf)
 - [OLS assumptions worksheet (in class)](materials/handouts/worksheet_w09.pdf)
+- [Discussion section 9](materials/discussion_section/dss_ch4_linear_regression.qmd)
 
 ### Week 10 — Linear regression III {#wk10}
 

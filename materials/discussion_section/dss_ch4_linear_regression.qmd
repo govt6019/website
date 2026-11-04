@@ -1,0 +1,270 @@
+---
+title: "DSS Chapter 4: Predicting Outcomes Using Linear Regression"
+subtitle: "Predicting GDP using prior GDP (Section 4.4.1, before log transformations)"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    df-print: paged
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Overview
+
+This walkthrough follows the Chapter 4 code in Llaudet and Imai, *Data Analysis for Social Science* (DSS), from the book's `Prediction.R` script, up to (but not including) the natural-log transformations in Section 4.4.2.
+
+The chapter's goal is to predict GDP growth using night-time light emissions measured from space (based on Henderson, Storeygard, and Weil 2012, *AER*). Before getting to light, the book builds intuition with a simpler model: predicting a country's GDP from its **prior** GDP.
+
+Code chunks marked **Book code** reproduce `Prediction.R`. Chunks marked **Extension** add steps that illustrate the concepts in Sections 4.2–4.3 (predicted values, residuals, least squares) but are not in the book's script.
+
+## Setup: Loading the Data
+
+**Book code.** Download the data from here (https://raw.githubusercontent.com/ellaudet/DSS/master/countries.csv) and read it in R.
+
+In a Quarto project it's simpler to keep `countries.csv` in the same folder as this `.qmd` (or read it straight from GitHub):
+
+```{r}
+co <- read.csv("countries.csv")  # reads and stores data
+
+## alternative: read directly from the book's GitHub repo
+## co <- read.csv("https://raw.githubusercontent.com/ellaudet/DSS/master/countries.csv")
+```
+
+## Understanding the Data
+
+**Book code.**
+
+```{r}
+head(co)  # shows first observations
+```
+
+The unit of observation is the country. The variables are:
+
+| Variable      | Description                                     |
+|---------------|-------------------------------------------------|
+| `country`     | country name                                    |
+| `gdp`         | GDP in the later year (trillions of US dollars) |
+| `prior_gdp`   | GDP in the earlier year                         |
+| `light`       | night-time light emissions in the later year    |
+| `prior_light` | night-time light emissions in the earlier year  |
+
+Check which variables are character vs. numeric, and binary vs. non-binary (all of the GDP and light variables are numeric and non-binary).
+
+```{r}
+dim(co)  # provides dimensions of dataframe: rows, columns
+```
+
+There are `r nrow(co)` countries in the data.
+
+## 4.4.1 Relationship between GDP and Prior GDP
+
+### Visualize the relationship
+
+**Book code.**
+
+```{r}
+#| fig-cap: "GDP vs. prior GDP"
+plot(x = co$prior_gdp, y = co$gdp)  # creates scatter plot
+```
+
+Most countries are clustered near the origin, and a few very large economies sit far out to the upper right. The relationship looks strongly positive and roughly linear.
+
+### Compute the correlation
+
+**Book code.**
+
+```{r}
+cor(co$gdp, co$prior_gdp)
+```
+
+The correlation is very close to 1: a country's past GDP is a strong linear predictor of its current GDP.
+
+### Fit the linear model
+
+The model is
+
+$$
+\widehat{\text{gdp}} = \widehat{\alpha} + \widehat{\beta}\,\text{prior_gdp}
+$$
+
+**Book code.** The book shows two equivalent ways to write the `lm()` call:
+
+```{r}
+lm(co$gdp ~ co$prior_gdp)        # option a: using $
+lm(gdp ~ prior_gdp, data = co)   # option b: using data argument
+```
+
+Both give the same coefficients. Option b is cleaner and is what you'll use going forward.
+
+### Interpreting the coefficients
+
+```{r}
+fit <- lm(gdp ~ prior_gdp, data = co) # saves fitted model
+summary(fit)
+coef(fit)
+```
+
+- **Intercept** ($\widehat{\alpha}$ = `r round(coef(fit)[1], 3)`): the predicted GDP when prior GDP is zero. Not substantively meaningful (no country has zero GDP), but it pins down where the line sits.
+- **Slope** ($\widehat{\beta}$ = `r round(coef(fit)[2], 3)`): a one-trillion-dollar increase in prior GDP is associated with a predicted increase of `r round(coef(fit)[2], 3)` trillion dollars in GDP. Equivalently, $\triangle \widehat{Y} = \widehat{\beta} \times \triangle X$.
+
+Note the language: "associated with a predicted change," not "causes." This is a predictive model.
+
+### Add the fitted line to the scatter plot
+
+**Book code.** `abline()` adds to the most recent plot, so the scatter plot and the line need to be in the same chunk:
+
+```{r}
+#| fig-cap: "Fitted regression line: GDP on prior GDP"
+plot(x = co$prior_gdp, y = co$gdp)  # creates scatter plot
+abline(fit)                          # adds line to scatter plot
+```
+
+## Extension: Predictions, Prediction Errors, and Least Squares
+
+These steps aren't in `Prediction.R`, but they make the concepts from Sections 4.2–4.3 concrete using the model you just fit.
+
+### Practice Questions
+
+## Practice Questions
+
+### Question 1
+
+How many countries are in the dataset, and what is the unit of observation? Use R to check.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{r}
+dim(co)
+```
+
+The data contain `r nrow(co)` observations (rows) and `r ncol(co)` variables (columns). The unit of observation is the country: each row is one country.
+:::
+
+### Question 2
+
+Create a scatter plot with prior GDP on the x-axis and GDP on the y-axis. Describe the relationship you see. Is it positive or negative? Does it look roughly linear?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{r}
+plot(x = co$prior_gdp, y = co$gdp)
+```
+
+The relationship is strongly positive and looks roughly linear: countries with higher GDP in the earlier year tend to have higher GDP in the later year. Most countries are clustered near the origin, with a few very large economies far out to the upper right.
+:::
+
+### Question 3
+
+Compute the correlation between GDP and prior GDP. Interpret it. Would you get a different answer if you wrote `cor(co$prior_gdp, co$gdp)` instead?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{r}
+cor(co$gdp, co$prior_gdp)
+```
+
+The correlation is `r round(cor(co$gdp, co$prior_gdp), 2)`. It is positive and very close to 1, which indicates a very strong positive linear relationship.
+
+Switching the order gives the same answer. Correlation is symmetric: it measures how strongly two variables move together linearly, and it doesn't distinguish between an outcome and a predictor.
+:::
+
+### Question 4
+
+Fit a linear model that predicts GDP using prior GDP, and save it as `fit`. Then write out the fitted line, $\widehat{Y} = \widehat{\alpha} + \widehat{\beta}X$, using the estimated coefficients. Finally, add the fitted line to the scatter plot.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{r}
+fit <- lm(gdp ~ prior_gdp, data = co)
+fit
+```
+
+The fitted line is:
+
+
+```{r}
+plot(x = co$prior_gdp, y = co$gdp)
+abline(fit)
+```
+
+Remember that the outcome ($Y$) goes on the left of `~` and the predictor ($X$) on the right.
+:::
+
+### Question 5
+
+Interpret the intercept and the slope of the model you fit in Question 4. Is the intercept substantively meaningful here? Why or why not?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+**Slope:** A one-trillion-dollar increase in prior GDP is associated with a predicted increase of `r round(coef(fit)[2], 3)` trillion dollars in GDP.
+
+**Intercept:** The predicted GDP for a country whose prior GDP was zero is `r round(coef(fit)[1], 3)` trillion dollars.
+
+The intercept is not substantively meaningful, because no country has a prior GDP of zero; the value of $X = 0$ lies outside the range of the data. The intercept still matters mechanically, because it determines where the line sits.
+:::
+
+
+### Question 6
+
+How does `lm()` decide which line to draw through the data? Why are the prediction errors squared rather than simply added up?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+`lm()` uses the least squares method: it chooses the intercept and slope that minimize the sum of squared residuals (SSR),
+
+$$
+\text{SSR} = \sum_{i=1}^{n} \widehat{\epsilon}_i^{\,2} = \sum_{i=1}^{n} (Y_i - \widehat{Y}_i)^2
+$$
+
+The errors are squared because some are positive and some are negative. If we simply added them up, positive and negative errors would cancel out, and a terrible line could still have a total error near zero. Squaring makes every error count, and it penalizes large errors more than small ones.
+:::
+
+### Question 8
+
+A classmate writes: "The slope shows that increasing a country's prior GDP by one trillion dollars *causes* its GDP to rise by about one trillion dollars." What is wrong with this statement? How would you rephrase it?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+This is a predictive model, not a causal one. The slope tells us how the predicted outcome changes with the predictor in these data; it does not tell us what would happen if we intervened to change prior GDP. Estimating causal effects requires the assumptions and research designs covered in Chapters 2 and 5.
+
+A better phrasing: "A one-trillion-dollar increase in prior GDP is *associated with* a predicted increase of about `r round(coef(fit)[2], 2)` trillion dollars in GDP."
+:::
+
+
+
+
+
+
+## Looking Ahead
+
+Go back to the scatter plot: almost all observations are bunched near the origin, while a handful of very large economies dominate the fit. Histograms make the skew obvious:
+
+```{r}
+#| fig-cap: "Distributions of GDP and prior GDP"
+par(mfrow = c(1, 2))
+hist(co$gdp)
+hist(co$prior_gdp)
+```
+
+This skew motivates Section 4.4.2, where the book takes the natural log of both variables.
+
+## Recap
+
+| Task                  | R code                               |
+|-----------------------|--------------------------------------|
+| Load data             | `co <- read.csv("countries.csv")`    |
+| Scatter plot          | `plot(x = co$prior_gdp, y = co$gdp)` |
+| Correlation           | `cor(co$gdp, co$prior_gdp)`          |
+| Fit linear model      | `fit <- lm(gdp ~ prior_gdp, data = co)` |
+| Add fitted line       | `abline(fit)`                        |
+
