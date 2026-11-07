@@ -104,6 +104,11 @@ Covers Weeks 1–6: data through inference.
 - [Omitted variable bias handout](materials/handouts/handout_ovb.pdf)
 - [OLS assumptions worksheet (in class)](materials/handouts/worksheet_w09.pdf)
 - [Discussion section 9](materials/discussion_section/dss_ch4_linear_regression.qmd)
+- [Problem set 9](materials/homework/hw_w09.pdf)
+- [Problem set 9 data (World Bank, sub-Saharan Africa)](materials/data/wdi_ssa.csv)
+- [World Bank sub-Saharan Africa codebook](materials/data/wdi_ssa_codebook.md)
+- [Problem set 9 data (American Time Use Survey 2025)](materials/data/atus2025.csv)
+- [American Time Use Survey 2025 codebook](materials/data/atus2025_codebook.md)
 
 ### Week 10 — Linear regression III {#wk10}
 

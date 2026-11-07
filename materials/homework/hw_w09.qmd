@@ -1,0 +1,216 @@
+---
+title: "{{< var course.code >}}: Homework 9 — Linear regression II and III"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+<!-- Drafted 2026-10-29 from the country-data OVB frames cut from the W9 deck
+(archived in _removed_ovb_frames_2026-10-28.md) and the cut simulation frame.
+Notation follows the deck: long regression Y = b0 + b1 X1 + b2 X2 + eps,
+short regression Y = b0* + b1* X1 + v, auxiliary regression
+X2 = d0 + d1 X1 + w, Bias = b1* - b1 = b2 d1.
+2026-11-03: HW 9 now covers Weeks 9 and 10. The OVB simulation (old Q4) was
+cut. Q4 (dummies) and Q5 (interactions) use the ATUS 2025 extract,
+data/atus2025.csv (scripts/make_atus2025.R). -->
+
+## Question 1: True or false
+
+State whether each claim is true or false. Give a one-sentence reason.
+
+a. A larger sample reduces omitted variable bias.
+
+b. Adding a control variable to a regression changes the slope on $X_1$ when
+   the control is uncorrelated with $X_1$ in the sample.
+
+c. If the observations are iid (each observation is drawn independently of
+   the others, and every observation comes from the same population
+   distribution), then $\E[\varepsilon \mid X_1] = 0$ holds.
+
+d. If Assumptions 1 (linearity), 2 (random sampling), 3 (no perfect
+   collinearity) and 4 (zero conditional mean) hold, OLS is the best linear
+   unbiased estimator (BLUE) of $\beta_1$.
+
+e. OLS can be BLUE even when the errors are not normally distributed.
+
+f. We can always detect a violation of Assumption 5 (homoskedasticity) with
+   a scatterplot of $Y$ against $X_1$.
+
+g. If every respondent in a survey lives in exactly one of four regions
+   (Northeast, Midwest, South or West), we can regress $Y$ on an intercept
+   and indicator variables for all four regions.
+
+h. To check Assumption 5 (homoskedasticity), we plot the residuals against
+   $X$ and ask whether the residuals average zero at every value of $X$.
+
+i. Assumption 1 (linearity) holds for
+   $Y_i = \beta_0 + \beta_1 X_i^2 + \varepsilon_i$ but not for
+   $Y_i = \beta_0 + X_i^{\beta_1} + \varepsilon_i$.
+
+## Question 2: Signing the bias
+
+Each study below regresses $Y$ on $X_1$ alone. This is the short regression:
+$$
+Y = \beta_0^* + \beta_1^* X_1 + v .
+$$
+Its estimated slope is $\hat\beta_1^*$. Suppose we also observed a
+confounder $X_2$. Then we could fit the long regression:
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \varepsilon .
+$$
+$\beta_1$ is the slope we want. $\delta_1$ is the population slope from
+regressing $X_2$ on $X_1$. The bias in $\hat\beta_1^*$ is
+$\E[\hat\beta_1^*] - \beta_1 = \beta_2\delta_1$.
+
+Choose three of the six studies (A–F below). For each study you choose:
+
+i.  Name one possible confounder, $X_2$. In one sentence, explain why $X_2$
+    is a confounder.
+ii. State the sign you expect for the bias in $\hat\beta_1^*$.
+
+**Study A.** Voters. $Y$: whether the person voted for the left-leaning (more liberal)
+candidate. $X_1$: whether the person lives in a city.
+
+**Study B.** Countries. $Y$: the share of the public that supports progressive
+taxation, that is, tax rates that rise with income. $X_1$: the share of
+the public that believes hard work is rewarded in their society.
+
+**Study C.** Pairs of countries, observed each year. $Y$: whether the two countries had
+a militarized dispute that year, that is, one threatened, displayed or
+used military force against the other. $X_1$: whether both countries are
+democracies.
+
+**Study D.** Cities. $Y$: the crime rate. $X_1$: the number of police officers per
+1,000 residents.
+
+**Study E.** Students in the United States. $Y$: the student's grade point average.
+$X_1$: whether the student receives free school lunch, a program for
+children from low-income families.
+
+**Study F.** Candidates for the US House of Representatives. $Y$: the candidate's
+share of the vote. $X_1$: the candidate's spending on TV and online
+advertising.
+
+## Question 3: Child mortality and national income
+
+The file `wdi_ssa.csv` holds World Bank data on countries in sub-Saharan
+Africa in 2021. Its codebook is `wdi_ssa_codebook.md`. `u5mort` is under-5
+mortality (deaths before age 5 per 1,000 live births). `goveff` is an index of
+government effectiveness. `gdppc` is GDP per capita in constant 2015 US
+dollars.
+
+```{r}
+library(tidyverse)
+ssa <- read_csv("data/wdi_ssa.csv") |>   # adjust to your folder layout
+  filter(!is.na(gdppc), !is.na(oilrents))
+```
+
+a. How many countries are left after the `filter()`? Why do we use the same
+   countries for every regression below?
+
+b. Regress `u5mort` on `goveff`. Report the slope and interpret it in words.
+
+c. List two variables, other than national income, that might be related to
+   child mortality and correlated with government effectiveness. For each,
+   give the sign you expect for $\beta_2$ and for $\delta_1$.
+
+d. Make a histogram of `gdppc`. Compare its mean and median. Create
+   `log_gdp_pc`, the natural log of `gdppc`, and make a histogram of
+   `log_gdp_pc`. Describe how the shape changes.
+
+e. Before running anything else, predict the signs of $\beta_2$ and
+   $\delta_1$ for $X_2$ = `log_gdp_pc`, and the sign of the bias in your
+   slope from (b).
+
+f. Regress `u5mort` on `goveff` and `log_gdp_pc`. Then regress `log_gdp_pc`
+   on `goveff`. Report $\hat\beta_1$, $\hat\beta_2$ and $\hat\delta_1$. Were
+   your predictions in (e) right?
+
+g. Check that the slope from (b) equals $\hat\beta_1 + \hat\beta_2
+   \hat\delta_1$. To how many decimal places do the two numbers agree?
+
+h. Interpret $\hat\beta_1$ from (f) in words.
+
+i. Repeat (f) and (g) with `oilrents` and then with `urban` as $X_2$ (one at
+   a time, each in place of `log_gdp_pc`). Report your results in a table with
+   columns $\hat\delta_1$, $\hat\beta_2$, $\hat\beta_2\hat\delta_1$ and the
+   long-regression slope on `goveff`. Which of the three variables changes the
+   slope on `goveff` the most? Explain why, using the two columns
+   $\hat\beta_2$ and $\hat\delta_1$.
+
+j. A classmate says: "Once we control for national income, the slope on
+   government effectiveness is the effect of making a government more
+   effective." Do you agree? Explain.
+
+## Question 4: Dummy variables and a categorical variable
+
+The file `atus2025.csv` holds data from the 2025 American Time Use Survey
+(ATUS). Its codebook is `atus2025_codebook.md`. Each respondent described one
+day, the diary day, activity by activity. `sleep`, `work` and `tv` are the
+minutes the respondent spent sleeping, working at a paid job and watching TV
+on that day. `day` is the day of the week of the diary day (1 = Sunday,
+7 = Saturday).
+
+```{r}
+atus <- read_csv("data/atus2025.csv") |>   # adjust to your folder layout
+  mutate(weekend = as.integer(day %in% c(1, 7)),
+         weekday = 1 - weekend)
+```
+
+a. Regress `sleep` on `weekday` and `weekend`. Report what R gives for the
+   coefficient on `weekend`. Explain the result using Assumption 3 (no perfect
+   collinearity).
+
+b. Regress `sleep` on `weekend` alone. Interpret the intercept and the slope.
+   Check that the slope equals the mean of `sleep` on weekend diaries minus
+   the mean of `sleep` on weekday diaries.
+
+c. Create `day_f`, a factor with the labels Sunday, Monday, ..., Saturday.
+   Make Monday the reference category with `relevel()`. Regress `work` on
+   `day_f`. Interpret the coefficients on Sunday and Tuesday. Then use the
+   coefficients to compute the average minutes of paid work on Saturday
+   diaries.
+
+## Question 5: Interactions
+
+Use the ATUS data from Question 4.
+
+a. Regress `sleep` on `age` and `weekend`. Interpret the coefficient on
+   `weekend`.
+
+b. Regress `sleep` on `age * weekend`. Write the fitted line for weekday
+   diaries and the fitted line for weekend diaries. What is the slope on
+   `age` in each line?
+
+c. What is the coefficient on `weekend` in (b)? To what age does this
+   coefficient refer? Is that age in the data?
+
+d. Compute the weekend difference in sleep at age 20 and at age 70, first by
+   hand from the coefficients in (b) and then with `comparisons()` from the
+   `marginaleffects` package. Describe the pattern in one sentence.
+
+e. Keep the respondents with a value for `voted`, with
+   `filter(!is.na(voted))`. `voted` comes from the November 2024 Current
+   Population Survey (see the codebook): 1 if the respondent said they voted
+   in the 2024 election, 0 if not. 509 respondents remain. Regress `tv` on
+   `voted * weekend`. Use the coefficients to compute the average TV time in
+   each of the four groups: voters and non-voters, on weekdays and on
+   weekends. Check your four numbers with `group_by()` and `summarise()`.
+   Report the number of respondents in each group.
+
+f. A classmate says: "Voting makes people watch less TV on weekends." Give two
+   reasons for caution. One reason should use your answer to (e). The other
+   should name a variable omitted from the regression.
