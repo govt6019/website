@@ -1,0 +1,305 @@
+---
+# Student worksheet. The answer key is worksheet_w10_solutions.qmd.
+# To build the PDF: open this file in RStudio and click Render,
+#   or type  quarto render worksheet_w10.qmd  in a terminal.
+title: "GOVT 6019: Week 10 worksheet: interactions in R"
+format:
+  pdf:
+    geometry: margin=0.8in
+    fontsize: 10pt
+execute:
+  echo: true      # print each code chunk in the PDF
+  warning: false  # hide R warnings
+  message: false  # hide package start-up messages
+---
+
+<!-- Notes for the TA.
+     - Answer space: each \vspace{3cm} line is a LaTeX command for 3 cm of
+       blank space. Change the number to give more or less room.
+     - Code questions are numbered C1 to C3. Statistics questions are
+       numbered 1 to 7.
+     - No question asks for a hypothesis test: lecture has not covered
+       testing yet. -->
+
+```{r setup}
+#| include: false
+# Hidden chunk: students do not see this code in the PDF.
+# The data file is in the course data folder, three folders up.
+# Students load the data with the visible chunk further down instead.
+library(tidyverse)
+atus <- read_csv("../../../data/atus2025.csv", show_col_types = FALSE)
+# Printed output is at most 80 characters wide.
+options(width = 80)
+```
+
+## The question and the data
+
+Do men and women watch different amounts of TV, and does the difference
+change with age? We use the 2025 American Time Use Survey (ATUS). Each of the
+6,146 respondents kept a diary of one day, activity by activity. About half of
+the diary days are Saturdays or Sundays.
+<!-- 6,146 = nrow(atus), printed below. -->
+
+| Variable | Meaning | Values |
+|---|---|---|
+| `tv` | Time watching television and movies on the diary day | minutes |
+| `age` | Respondent's age | 15 to 85; 80 means 80 to 84, 85 means 85 or older |
+| `female` | Respondent is female | 1 = female, 0 = male |
+
+We convert `tv` to hours and fit the model
+
+$$
+\texttt{tv\_hours} = \beta_0 + \beta_1\,\texttt{age} + \beta_2\,\texttt{female}
++ \beta_3\,(\texttt{age} \times \texttt{female}) + \varepsilon .
+$$
+
+Put the file `atus2025.csv` in the same folder as your R script. Then load
+the data.
+
+```{r}
+#| eval: false
+# library() loads a package. After loading, we can use its functions.
+# The tidyverse package has read_csv(), mutate() and filter().
+library(tidyverse)
+
+# read_csv() reads a .csv file into R as a data frame (a table).
+# <- is the assignment arrow. The result on the right is stored
+#   under the name on the left, here atus.
+atus <- read_csv("atus2025.csv")
+```
+
+```{r}
+# nrow(atus) is the number of rows in atus: one row per respondent.
+nrow(atus)
+
+# With mutate(), we add a new column to a data frame.
+# The new column tv_hours equals tv (in minutes) divided by 60.
+# The data frame with the new column is stored under the old name atus.
+atus <- mutate(atus, tv_hours = tv / 60)
+
+# atus$tv_hours is the tv_hours column of atus.
+#   The $ sign separates the data frame name from the column name.
+# head(x) is the first six values of x.
+head(atus$tv_hours)
+```
+
+**C1.** Suppose we run `mutate(atus, tv_hours = tv / 60)` without `atus <-`
+in front. Does `atus` then have a column called `tv_hours`? Why or why not?
+
+\vspace{2cm}
+
+## Part A: the interacted model
+
+```{r}
+# lm() is the R function for a linear regression ("linear model").
+# The ~ (tilde) separates the outcome, on the left,
+#   from the explanatory variables, on the right.
+# age * female is R shorthand for all three terms:
+#   age, female, and age:female (the product of age and female).
+# data = atus: the variables are columns of the data frame atus.
+# We store the fitted regression under the name fit.
+fit <- lm(tv_hours ~ age * female, data = atus)
+
+# summary(fit) is a report on the fitted regression.
+# Today we use the Estimate and Std. Error columns.
+# We will learn about the t value and Pr(>|t|) columns later.
+summary(fit)
+```
+
+**1.** Write the fitted line for men (`female` = 0) and the fitted line for
+women (`female` = 1). Each line has the form
+$\widehat{\texttt{tv\_hours}} = a + b\,\texttt{age}$. In one sentence each,
+interpret the two slopes.
+
+\vspace{3cm}
+
+<!-- 0.195: the Estimate in the female row of summary(fit). -->
+**2.** The coefficient on `female` is 0.195. This number equals the gap
+between women and men at which age? Is that a useful age to report?
+
+\vspace{2.2cm}
+
+## Part B: two separate regressions
+
+Fit a simple regression of `tv_hours` on `age` among men only, and another
+among women only.
+
+```{r}
+# With filter(), we keep only the rows that meet a condition.
+# female == 0 is TRUE for men and FALSE for women.
+# filter(atus, female == 0) is then the data for men only.
+# fit0 is the regression of tv_hours on age among men.
+fit0 <- lm(tv_hours ~ age, data = filter(atus, female == 0))
+
+# The same steps for women: female == 1.
+fit1 <- lm(tv_hours ~ age, data = filter(atus, female == 1))
+
+# summary(fit0)$coefficients is the coefficient table alone.
+#   Here the $ sign takes one part out of the summary.
+summary(fit0)$coefficients
+summary(fit1)$coefficients
+```
+
+**C2.** Why does `filter(atus, female == 1)` use two equals signs? What is
+the job of the single equals sign in `data = atus`?
+
+\vspace{2cm}
+
+**3.** Compare the intercepts and slopes of `fit0` and `fit1` with your two
+lines from Question 1. Which numbers match? Are the standard errors on `age`
+the same in `fit0` and in the interacted model `fit`?
+
+\vspace{2.6cm}
+
+## Part C: re-centering age
+
+To get the gap between women and men at age 50, subtract 50 from age and
+refit.
+
+```{r}
+# New column age50: each respondent's age minus 50.
+#   Here we add a column with $ and <- instead of mutate().
+atus$age50 <- atus$age - 50
+
+# Fit the same model with age50 in place of age.
+fit50 <- lm(tv_hours ~ age50 * female, data = atus)
+summary(fit50)$coefficients
+```
+
+**C3.** What does `atus$age - 50` produce? What is the value of `age50` for
+a respondent aged 50? For a respondent aged 30? You can check with
+`head(atus$age)` and `head(atus$age50)`.
+
+\vspace{2cm}
+
+<!-- -0.546: the Estimate in the female row of summary(fit50)$coefficients. -->
+**4.** The coefficient on `female` is now -0.546. What does this number
+equal? Check your answer with the coefficients from `fit`.
+
+\vspace{2.2cm}
+
+**5.** Write the code for ages 25 and 75, and fill in the table. Copy the
+three lines of code above. Then change 50 to 25 (or 75) everywhere. Take the
+standard error from the `Std. Error` column of the row for `female`.
+
+<!-- Age-50 row: female row of summary(fit50)$coefficients. -->
+| Age | Gap: women minus men (hours) | Standard error |
+|:---:|:---:|:---:|
+| 25 | | |
+| 50 | -0.546 | 0.077 |
+| 75 | | |
+
+\vspace{3cm}
+
+{{< pagebreak >}}
+
+## Part D (optional): the `marginaleffects` package
+
+With the `comparisons()` function in the `marginaleffects` package, we can
+compute the same gaps without refitting the model.
+
+```{r}
+# Install once, before section: install.packages("marginaleffects")
+library(marginaleffects)
+
+# With comparisons(), we compute the difference in predicted tv_hours
+#   between two values of a variable.
+# variables = "female": the difference is female = 1 minus female = 0.
+# datagrid(age = c(25, 50, 75)): we compute the difference at these ages.
+#   c() combines several values into one vector.
+comparisons(fit, variables = "female",
+            newdata = datagrid(age = c(25, 50, 75)))
+# 2.5 % and 97.5 % are the ends of a 95% confidence interval.
+# We will learn about the z, Pr(>|z|) and S columns later.
+```
+
+**6.** Compare the `Estimate` and `Std. Error` columns with your table from
+Question 5.
+
+\vspace{1.8cm}
+
+## Part E (optional): is the gap a straight line in age?
+
+In the model
+$$
+\texttt{tv\_hours} = \beta_0 + \beta_1\,\texttt{age} + \beta_2\,\texttt{female}
++ \beta_3\,(\texttt{age} \times \texttt{female}) + \varepsilon ,
+$$
+the gap between women and men at age $a$ equals $\beta_2 + \beta_3\,a$. With
+each extra year of age, the gap changes by the same amount, $\beta_3$. In
+other words, in this model the gap is a straight line in age.
+
+The `interflex` package (Hainmueller, Mummolo and Xu 2019) has a check for
+this assumption, the binning estimator. We split the respondents into three
+age groups of equal size. We estimate the gap separately within each group.
+In the plot, we can then compare the three estimates with the straight line
+from the model.
+
+```{r}
+#| eval: false
+# Install once, before section. Installing interflex also installs
+#   about 70 other packages.
+install.packages("interflex")
+```
+
+```{r iflex}
+#| fig-width: 5.8
+#| fig-height: 3
+#| fig-align: center
+library(interflex)
+
+# estimator = "binning": split age into three groups and estimate
+#   the gap within each group.
+# as.data.frame(atus): we must give interflex() a plain data frame.
+#   read_csv() makes a "tibble", a special kind of data frame.
+# Y is the outcome. D is the 0/1 variable.
+#   X is the variable along which the gap may change.
+# na.rm = TRUE: drop rows with missing values.
+out <- interflex(estimator = "binning", data = as.data.frame(atus),
+                 Y = "tv_hours", D = "female", X = "age",
+                 na.rm = TRUE)
+# The printed note means men (female = 0) are the comparison group.
+
+# out$figure is the plot.
+out$figure
+```
+
+In the plot, "CME" stands for conditional marginal effect: the gap in daily
+TV hours between women and men at a given age. The black line and its grey
+band are the gap from the model above. The three red points, with their
+intervals, are the gaps estimated within the low (L), middle (M) and high (H)
+age groups. The histogram at the bottom is the number of respondents at each
+age.
+
+**7.** Do the three red points lie close to the black line? From the three
+points, what can we say about how the gap changes with age?
+
+\vspace{3cm}
+
+{{< pagebreak >}}
+
+::: {.callout-note icon=false}
+## Reminder: `slopes()` versus `comparisons()`
+
+- The result of `slopes()` is a derivative: the rate of change in the predicted
+  outcome for a very small change in a variable. We use `slopes()` for a
+  continuous variable such as `age`.
+- The result of `comparisons()` is the difference between two predictions, by
+  default at $x$ and $x + 1$. For a 0/1 variable such as `female`, the two
+  predictions are at 0 and 1.
+- In the model above, the predicted TV hours are a straight line in `age`
+  within each group. For `age`, the results of the two functions are then equal.
+:::
+
+::: {.callout-note icon=false}
+## Reminder: interpreting $Y = \beta_0 + \beta_1 x + \beta_2 z + \beta_3 (x \times z) + \varepsilon$ with a 0/1 variable $z$
+
+- $\beta_1$, the coefficient on $x$: the slope of $x$ when $z = 0$.
+- $\beta_3$, the coefficient on $x \times z$: the slope when $z = 1$ minus
+  the slope when $z = 0$.
+- $\beta_2$, the coefficient on $z$: the gap between the two lines at
+  $x = 0$.
+- To get the gap at $x = c$, with a standard error, subtract $c$ from $x$
+  and refit.
+- In R, the formula `y ~ x * z` includes all four terms.
+:::
