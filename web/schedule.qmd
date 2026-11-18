@@ -125,8 +125,8 @@ Covers Weeks 1–6: data through inference.
 *Seminar Fri Nov 20 · Section Wed Dec 2*
 
 - [Interactions, polynomials and logarithms handout](materials/handouts/handout_nonlinear.pdf)
-- [Discussion section 11 (part 1)](../materials/discussion_section/lab_w11.pdf)
-- [Worked example with penguins Data](../materials/discussion_section/lab_w11_penguins.pdf)
+- [Discussion section 11 (part 1)](materials/discussion_section/lab_w11.pdf)
+- [Worked example with penguins Data](materials/discussion_section/lab_w11_penguins.pdf)
 
 *Thanksgiving Break, Wed Nov 25 – Sun Nov 29: both meetings cancelled.*
 
