@@ -1,0 +1,178 @@
+---
+title: "{{< var course.code >}}: Homework 11 — Inference for regression"
+subtitle: "{{< var course.semester >}}"
+author:
+  - "{{< var course.instructor >}} (Instructor)"
+  - "{{< var course.ta >}} (Teaching Assistant)"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    fontsize: 11pt
+    geometry: margin=1in
+    colorlinks: true
+    include-in-header:
+      - file: ../../theme/macros.tex
+execute:
+  echo: true
+  eval: false
+---
+
+<!-- Drafted 2026-11-11 from slides_w11.qmd. Covers polynomials and adjusted
+R² (carried from W10), t tests and CIs for a coefficient, robust
+and clustered SEs. The coverage simulation question was
+dropped 2026-11-11 (user: too hard). Data: the ATUS 2025
+extract (data/atus2025.csv), not the deck's country and ANES regressions.
+Numbers checked 2026-11-11 (scratchpad scripts):
+- Q2 reading ~ age + college, summary() with [A] df 6143, [B] t 12.634,
+  [C] SE 1.54647, [D] adj. R² 0.03838 censored.
+- Q3 sleep ~ age + I(age^2): minimum near age 58.5; adj. R² 0.007 -> 0.019.
+- Q4 tv ~ age + female + college + region_f: Midwest p = 0.18, South
+  p = 0.65, West p = 0.02.
+Q1 revised 2026-11-20: (a) reworded, (b) null changed to beta1 = 0 (now true),
+old (h) on clustering with 4 schools dropped.
+Q3 revised 2026-11-20: R hint for (a), fitted equations in (b), old (c)
+(t test on the quadratic term) dropped, old (d) split into (c) and (d),
+significance-vs-importance part of (e) cut.
+Q5 (the bootstrap) moved to _carry_to_w12_hw.qmd on 2026-11-19, with the
+bootstrap frames. The F-test items (old Q1(d), Q2(g), Q4(c)-(e)) were cut
+2026-11-19: the F test is held back from the deck. Also 2026-11-19: HC1 -> HC0
+to match the deck, and the F-statistic line cut from the Q2 output (it gave
+away [A]). -->
+
+## Question 1: True or false
+
+State whether each claim is true or false. Give a one-sentence reason.
+
+a. In a regression of $Y$ on $X$, if the estimated coefficient on $X$ has
+   $p = 0.03$, this means that the probability that $\beta_1 = 0$ is 0.03.
+
+b. The 95% confidence interval for $\beta_1$ is $[0.2, 1.4]$. At
+   $\alpha = 0.05$, we reject $H_0\colon \beta_1 = 0$.
+
+c. The 95% confidence interval for $\beta_1$ is $[0.2, 1.4]$. At
+   $\alpha = 0.10$, we reject $H_0\colon \beta_1 = 0$.
+
+d. With $n = 100{,}000$, a coefficient can be statistically significant at
+   $\alpha = 0.001$ and substantively negligible.
+
+e. If the errors are heteroskedastic, $\hat\beta_1$ is a biased estimator of
+   $\beta_1$.
+
+f. `lm_robust(y ~ x, se_type = "HC0")` and `lm(y ~ x)` report different
+   values of $\hat\beta_1$.
+
+g. If the errors are homoskedastic, a 95% confidence interval built with the
+   robust standard error has coverage well below 0.95 in large samples.
+
+h. Adding an explanatory variable to a regression can lower adjusted $R^2$.
+
+i. In $Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \varepsilon$, $\beta_1$ is the
+   change in $\E[Y \mid X]$ for a one-unit increase in $X$.
+
+j. We can count the coverage of a confidence-interval procedure in one real
+   data set by checking whether the interval contains $\beta_1$.
+
+## Question 2: A coefficient table by hand
+
+Answer this question with a calculator. In R, use only `qt()` and `pt()`.
+
+The file `atus2025.csv` holds data from the 2025 American Time Use Survey
+(ATUS). `reading` is the minutes the respondent spent reading for personal
+interest on the diary day. `age` is the respondent's age in years. `college`
+is 1 if the respondent has a bachelor's degree or higher and 0 otherwise. The
+regression of `reading` on `age` and `college` uses all $n = 6{,}146$
+respondents. Below is the output of `summary()`. Four numbers are replaced
+with the letters [A] to [D].
+
+```
+Call:
+lm(formula = reading ~ age + college, data = atus)
+
+Residuals:
+   Min     1Q Median     3Q    Max
+-45.63 -25.26 -17.42  -1.40 926.88
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept) -13.21951    2.42884  -5.443 5.45e-08
+age           0.52230    0.04134     [B]  < 2e-16
+college      14.45253        [C]   9.345  < 2e-16
+
+Residual standard error: 60.21 on [A] degrees of freedom
+Multiple R-squared:  0.0387,   Adjusted R-squared:  [D]
+```
+
+a. Find [A]. Show the calculation.
+
+b. Find [B]. State the null hypothesis it tests.
+
+c. Find [C].
+
+d. Find [D].
+
+e. Compute the 95% confidence interval for $\beta_{\text{college}}$.
+
+f. Interpret $\hat\beta_{\text{college}}$ in words. Is the difference
+   substantively large? Give a reason in minutes per day.
+
+## Question 3: Sleep and age
+
+Use `atus2025.csv`. Its codebook is `atus2025_codebook.md`. `sleep` is the
+minutes the respondent spent sleeping on the diary day.
+
+```{r}
+library(tidyverse)
+library(estimatr)
+atus <- read_csv("data/atus2025.csv")   # adjust to your folder layout
+```
+
+a. Make a scatterplot of `sleep` against `age`, with one point per
+   respondent. Then add a second layer of points, in a different color,
+   that shows the mean of `sleep` at each age.
+
+   *R hint:* create a new data frame called `sleep_means` with one row per
+   age, using `group_by(age)` and `summarise(sleep = mean(sleep))`. Then add
+   a second `geom_point()` to the plot with
+   `geom_point(data = sleep_means, color = "red")`.
+
+b. Regress `sleep` on `age`. Then regress `sleep` on `age` and `I(age^2)`.
+   Report the coefficients and standard errors of both regressions. Write
+   out both fitted equations, in the form
+   $\widehat{\texttt{sleep}} = \hat\beta_0 + \hat\beta_1 \texttt{age}$ and
+   $\widehat{\texttt{sleep}} = \hat\beta_0 + \hat\beta_1 \texttt{age} + \hat\beta_2 \texttt{age}^2$,
+   with your estimates in place of the $\hat\beta$'s.
+
+c. Using the second regression, compute the slope of the fitted curve at age
+   25 and at age 70.
+
+d. Using the second regression, at what age does the fitted curve reach its
+   minimum?
+
+e. Report $R^2$ and adjusted $R^2$ for both regressions.
+
+## Question 4: TV and region
+
+Use `atus2025.csv`. `tv` is the minutes the respondent spent watching
+television and movies on the diary day. `region` is the Census region.
+
+```{r}
+atus <- atus |>
+  mutate(region_f = factor(region, levels = 1:4,
+                           labels = c("Northeast", "Midwest", "South", "West")))
+```
+
+a. Regress `tv` on `age`, `female`, `college` and `region_f`. Interpret the
+   coefficient on `female` and its 95% confidence interval.
+
+b. Report the $p$-value for each of the three region dummies. Which dummies
+   are statistically significant at $\alpha = 0.05$? What is the reference
+   category?
+
+c. Refit the regression with `lm_robust(..., se_type = "HC0")`. Make a table
+   with the usual and robust standard errors for every coefficient. How much
+   do they differ?
+
+d. A classmate wants to cluster the standard errors by region, because
+   respondents in the same region may share unobserved influences on TV time.
+   Give one reason this is a bad idea with these data.

@@ -128,6 +128,9 @@ Covers Weeks 1–6: data through inference.
 - [Interactions, polynomials and logarithms handout](materials/handouts/handout_nonlinear.pdf)
 - [Discussion section 11 (part 1)](materials/discussion_section/lab_w11.pdf)
 - [Worked example with penguins data](materials/discussion_section/lab_w11_penguins.pdf)
+- [Problem set 11](materials/homework/hw_w11.pdf)
+- [Problem set 11 data (American Time Use Survey 2025)](materials/data/atus2025.csv)
+- [American Time Use Survey 2025 codebook](materials/data/atus2025_codebook.md)
 
 *Thanksgiving Break, Wed Nov 25 – Sun Nov 29: both meetings cancelled.*
 
